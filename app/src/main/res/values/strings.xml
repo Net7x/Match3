@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">Match3</string>
+    <string name="CompanyName1">PYC</string>
+    <string name="CompanyName2">soft</string>
+    <string name="pyc_soft_logo">PYC soft logo</string>
 </resources>

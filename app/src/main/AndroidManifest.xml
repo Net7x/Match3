@@ -17,7 +17,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".MainMenuActivity" />
-        <activity android:name=".ClassicGame"></activity>
+        <activity android:name=".ClassicGame" />
+
     </application>
 
 </manifest>
