@@ -27,6 +27,6 @@ public class TitleActivity extends Activity {
                 Intent intent = new Intent(current, MainMenuActivity.class);
                 startActivity(intent);
             }
-        }, 3000);
+        }, 2000);
     }
 }
