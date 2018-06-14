@@ -1,8 +1,11 @@
 package com.shageev.pavel.match3;
 
 import android.app.Activity;
+import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.view.Display;
+import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
@@ -12,24 +15,37 @@ public class ClassicGame extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        LinearLayout ll = new LinearLayout(this);
-        ll.setOrientation(LinearLayout.VERTICAL);
+        GridLayout ll = new GridLayout(this);
+        //LinearLayout ll = new LinearLayout(this);
+        //ll.setOrientation(LinearLayout.VERTICAL);
 
         ll.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.MATCH_PARENT));
 
-//ImageView Setup
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+
+        int layoutWidth = size.x;
+        int layoutHeight = size.y;
+
+        int tileWidth = layoutWidth / 8;
+
         ImageView imageView = new ImageView(this);
 
-//setting image resource
-        imageView.setImageResource(R.drawable.i1);
+        imageView.setImageResource(R.drawable.a1);
 
-//setting image position
-        imageView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT));
+        imageView.setLayoutParams(new LinearLayout.LayoutParams(tileWidth,tileWidth));
 
-//adding view to layout
         ll.addView(imageView);
+
+        ImageView a2 = new ImageView(this);
+
+        a2.setImageResource(R.drawable.a2);
+
+        a2.setLayoutParams(new LinearLayout.LayoutParams(tileWidth, tileWidth));
+
+        ll.addView(a2);
 
         setContentView(ll);
 
