@@ -4,7 +4,7 @@ import android.graphics.Canvas;
 
 public class GameLoop extends Thread {
     private GameView view;
-    static private long FPS = 30;
+    static private long FPS = 15;
     private boolean running = false;
     boolean isPaused;
 
@@ -42,7 +42,7 @@ public class GameLoop extends Thread {
                 try {
                     c = view.getHolder().lockCanvas();
                     synchronized (view.getHolder()){
-                        view.draw(c);
+                        view.onDraw(c);
                     }
                 } finally {
                     if(c != null){
