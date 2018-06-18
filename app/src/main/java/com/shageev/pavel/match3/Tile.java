@@ -4,4 +4,6 @@ public class Tile {
     int Column, Row;
     int Type;
     int dX, dY;
+
+
 }

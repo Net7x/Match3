@@ -25,6 +25,7 @@ public class GameView extends SurfaceView {
     private int COLUMNS = 7;
     Random r = new Random();
     int[][] gameField;
+    GameField gField;
     int moveTileCol, moveTileRow;
     int prevX, prevY;
     int deltaX, deltaY;
@@ -60,6 +61,9 @@ public class GameView extends SurfaceView {
                 Tiles.add(t);
             }
         }
+        
+        gField = new GameField(COLUMNS);
+        gField.init(Tiles);
 
         SelectedTileIndex = -1;
 
