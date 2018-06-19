@@ -25,14 +25,16 @@ public class GameView extends SurfaceView {
     Bitmap a1Scaled, a2Scaled, a3Scaled, a4Scaled, a5Scaled, a6Scaled, a7Scaled, a8Scaled, a9Scaled;
     private GameView thisView;
     private int COLUMNS = 7;
+    private int MOVE_THRESHOLD = 20;
     Random r = new Random();
     int[][] gameField;
     GameField gField;
     int moveTileCol, moveTileRow;
     int prevX, prevY;
     int deltaX, deltaY;
-    ArrayList<Tile> Tiles;
+    //ArrayList<Tile> Tiles;
     int SelectedTileIndex;
+    Rect transformRect = new Rect();
 
     public GameView(Context context){
         super(context);
@@ -51,21 +53,8 @@ public class GameView extends SurfaceView {
                 { 8, 2, 1, 0, 2, 3, 4, 1 }
         };
 
-        Tiles = new ArrayList<>();
-        for(int i = 0; i < COLUMNS; i++){
-            for(int j = 0; j < COLUMNS; j++){
-                Tile t = new Tile();
-                t.Column = j;
-                t.Row = i;
-                t.Type = gameField[i][j];
-                t.dX = 0;
-                t.dY = 0;
-                Tiles.add(t);
-            }
-        }
-        
         gField = new GameField(COLUMNS);
-        gField.init(Tiles);
+        gField.init(gameField);
 
         SelectedTileIndex = -1;
 
@@ -92,20 +81,17 @@ public class GameView extends SurfaceView {
             }
         });
 
-
-
-
         DisplayMetrics dm;
         dm = Resources.getSystem().getDisplayMetrics();
         setScreenDimensions(dm.widthPixels, dm.heightPixels);
     }
 
     protected void update(double modifier){
-        for(int i = 0; i < Tiles.size(); i++){
-            Tile t = Tiles.get(i);
+        for(int i = 0; i < gField.Tiles.size(); i++){
+            Tile t = gField.Tiles.get(i);
             if(t.Selected){
                 t.jumpPhase += modifier * 10 ;
-                Tiles.set(i, t);
+                gField.Tiles.set(i, t);
             }
         }
     }
@@ -113,36 +99,26 @@ public class GameView extends SurfaceView {
     @Override
     protected void onDraw(Canvas canvas){
         if(canvas != null && ResourceManager.getInstance().scaledImagesLoaded){
-            Bitmap selectedTileBitmap = null;
             canvas.drawColor(Color.BLACK);
-            for(int i = 0; i < Tiles.size(); i++){
+            for(int i = 0; i < gField.Tiles.size(); i++){
                 Bitmap b;
-                Tile t = Tiles.get(i);
+                Tile t = gField.Tiles.get(i);
                 double jumpModifier = 0;
                 if(t.Selected){
                     jumpModifier = Math.cos(t.jumpPhase) * tileWidth / 6;
                 }
                 b = ResourceManager.getInstance().tileImages.get(t.Type);
-                if(SelectedTileIndex != i) {
-                    if(jumpModifier < 0) {
-                        canvas.drawBitmap(b, screenDw + t.Column * tileWidth + t.dX, screenDh + t.Row * tileWidth + t.dY + (int) jumpModifier, null);
-                    } else {
-                        canvas.drawBitmap(b, null,
-                                new Rect(
-                                        screenDw + t.Column * tileWidth + t.dX - (int)(jumpModifier / 4),
-                                        screenDh + t.Row * tileWidth + (int)(jumpModifier / 2) + t.dY,
-                                        screenDw + t.Column * tileWidth + tileWidth + t.dX + (int)(jumpModifier / 4),
-                                        screenDh + t.Row * tileWidth + tileWidth + t.dY),
-                                null);
-                    }
-                } else {
-                    selectedTileBitmap = b;
-                }
 
-            }
-            if(SelectedTileIndex >= 0 && selectedTileBitmap != null){
-                Tile t = Tiles.get(SelectedTileIndex);
-                canvas.drawBitmap(selectedTileBitmap, screenDw + t.Column * tileWidth + t.dX, screenDh + t.Row * tileWidth + t.dY, null);
+                if(jumpModifier <= 0) {
+                    canvas.drawBitmap(b, screenDw + t.Column * tileWidth + t.dX, screenDh + t.Row * tileWidth + t.dY + (int) jumpModifier, null);
+                } else {
+                    transformRect.set(
+                            screenDw + t.Column * tileWidth + t.dX - (int)(jumpModifier / 4),
+                            screenDh + t.Row * tileWidth + (int)(jumpModifier / 2) + t.dY,
+                            screenDw + t.Column * tileWidth + tileWidth + t.dX + (int)(jumpModifier / 4),
+                            screenDh + t.Row * tileWidth + tileWidth + t.dY);
+                    canvas.drawBitmap(b, null, transformRect, null);
+                }
             }
         }
     }
@@ -155,40 +131,44 @@ public class GameView extends SurfaceView {
         switch(event.getAction()){
             case MotionEvent.ACTION_MOVE:
                 if(SelectedTileIndex >= 0){
-                    Tile t = Tiles.get(SelectedTileIndex);
+                    Tile t = gField.Tiles.get(SelectedTileIndex);
                     t.dX = t.dX + (x - prevX);
                     t.dY = t.dY + (y - prevY);
-                    t.Selected = false;
-                    Tiles.set(SelectedTileIndex, t);
+                    if(Math.abs(t.dX) > MOVE_THRESHOLD || Math.abs(t.dY) > MOVE_THRESHOLD) {
+                        t.Selected = false;
+                    }
+                    gField.Tiles.set(SelectedTileIndex, t);
                 }
                 break;
             case MotionEvent.ACTION_DOWN:
                 moveTileCol = (int)Math.floor((x - screenDw) / tileWidth);
                 moveTileRow = (int)Math.floor((y - screenDh) / tileWidth);
 
-                for(int i = 0; i < Tiles.size(); i++){
-                    Tile t = Tiles.get(i);
-                    if(t.Selected){
-                        t.Selected = false;
-                        Tiles.set(i, t);
+                for(int i = 0; i < gField.Tiles.size(); i++){
+                    Tile t = gField.Tiles.get(i);
+                    if(t.Column == moveTileCol && t.Row == moveTileRow){
+                        t.Selected = !t.Selected;
+                        t.jumpPhase = 0;
+                        gField.Tiles.set(i, t);
+                    } else {
+                        if(t.Selected) {
+                            t.Selected = false;
+                            t.jumpPhase = 0;
+                            gField.Tiles.set(i, t);
+                        }
                     }
+
                 }
                 SelectedTileIndex = gField.getTileId(moveTileRow, moveTileCol);
 
                 break;
             case MotionEvent.ACTION_UP:
                 if(SelectedTileIndex >= 0) {
-                    Tile t = Tiles.get(SelectedTileIndex);
-                    if(Math.abs(t.dX)< 10  && Math.abs(t.dY) < 10) {
-                        t.Selected = !t.Selected;
-                        t.jumpPhase = 0;
-                    }
-                    else {
-                        t.Selected = false;
-                    }
+                    Tile t = gField.Tiles.get(SelectedTileIndex);
+
                     t.dX = 0;
                     t.dY = 0;
-                    Tiles.set(SelectedTileIndex, t);
+                    gField.Tiles.set(SelectedTileIndex, t);
 
                     SelectedTileIndex = -1;
                 }
