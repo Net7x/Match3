@@ -23,4 +23,14 @@ public class ExampleInstrumentedTest {
 
         assertEquals("com.shageev.pavel.match3", appContext.getPackageName());
     }
+
+    @Test
+    public void resourseManager() {
+        Context ctx = InstrumentationRegistry.getTargetContext();
+
+        ResourceManager rm = ResourceManager.getInstance();
+        rm.loadImages(ctx.getResources());
+        rm.scaleImages(50);
+        assertEquals(true, rm.tileImages.size() > 0);
+    }
 }
