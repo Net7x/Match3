@@ -14,8 +14,14 @@ public class ClassicGame extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(new GameView(this));
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        ResourceManager.getInstance().loadImages(this.getResources());
+        ResourceManager.getInstance().scaleImages();
     }
 }

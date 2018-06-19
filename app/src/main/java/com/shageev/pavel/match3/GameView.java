@@ -6,6 +6,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -49,7 +51,7 @@ public class GameView extends SurfaceView {
                 { 8, 2, 1, 0, 2, 3, 4, 1 }
         };
 
-        Tiles = new ArrayList<Tile>();
+        Tiles = new ArrayList<>();
         for(int i = 0; i < COLUMNS; i++){
             for(int j = 0; j < COLUMNS; j++){
                 Tile t = new Tile();
@@ -81,18 +83,6 @@ public class GameView extends SurfaceView {
             @Override
             public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int w, int h) {
                 setScreenDimensions(w, h);
-
-                if(tileWidth > 0){
-                    a1Scaled = Bitmap.createScaledBitmap(a1, tileWidth, tileWidth, true);
-                    a2Scaled = Bitmap.createScaledBitmap(a2, tileWidth, tileWidth, true);
-                    a3Scaled = Bitmap.createScaledBitmap(a3, tileWidth, tileWidth, true);
-                    a4Scaled = Bitmap.createScaledBitmap(a4, tileWidth, tileWidth, true);
-                    a5Scaled = Bitmap.createScaledBitmap(a5, tileWidth, tileWidth, true);
-                    a6Scaled = Bitmap.createScaledBitmap(a6, tileWidth, tileWidth, true);
-                    a7Scaled = Bitmap.createScaledBitmap(a7, tileWidth, tileWidth, true);
-                    a8Scaled = Bitmap.createScaledBitmap(a8, tileWidth, tileWidth, true);
-                    a9Scaled = Bitmap.createScaledBitmap(a9, tileWidth, tileWidth, true);
-                }
             }
 
             @Override
@@ -102,66 +92,53 @@ public class GameView extends SurfaceView {
             }
         });
 
-        a1 = BitmapFactory.decodeResource(getResources(), R.drawable.a1);
-        a2 = BitmapFactory.decodeResource(getResources(), R.drawable.a2);
-        a3 = BitmapFactory.decodeResource(getResources(), R.drawable.a3);
-        a4 = BitmapFactory.decodeResource(getResources(), R.drawable.a4);
-        a5 = BitmapFactory.decodeResource(getResources(), R.drawable.a5);
-        a6 = BitmapFactory.decodeResource(getResources(), R.drawable.a6);
-        a7 = BitmapFactory.decodeResource(getResources(), R.drawable.a7);
-        a8 = BitmapFactory.decodeResource(getResources(), R.drawable.a8);
-        a9 = BitmapFactory.decodeResource(getResources(), R.drawable.a9);
 
-        DisplayMetrics dm = new DisplayMetrics();
+
+
+        DisplayMetrics dm;
         dm = Resources.getSystem().getDisplayMetrics();
         setScreenDimensions(dm.widthPixels, dm.heightPixels);
+    }
 
-        a1Scaled = Bitmap.createScaledBitmap(a1, tileWidth, tileWidth, true);
-        a2Scaled = Bitmap.createScaledBitmap(a2, tileWidth, tileWidth, true);
-        a3Scaled = Bitmap.createScaledBitmap(a3, tileWidth, tileWidth, true);
-        a4Scaled = Bitmap.createScaledBitmap(a4, tileWidth, tileWidth, true);
-        a5Scaled = Bitmap.createScaledBitmap(a5, tileWidth, tileWidth, true);
-        a6Scaled = Bitmap.createScaledBitmap(a6, tileWidth, tileWidth, true);
-        a7Scaled = Bitmap.createScaledBitmap(a7, tileWidth, tileWidth, true);
-        a8Scaled = Bitmap.createScaledBitmap(a8, tileWidth, tileWidth, true);
-        a9Scaled = Bitmap.createScaledBitmap(a9, tileWidth, tileWidth, true);
+    protected void update(double modifier){
+        for(int i = 0; i < Tiles.size(); i++){
+            Tile t = Tiles.get(i);
+            if(t.Selected){
+                t.jumpPhase += modifier * 10 ;
+                Tiles.set(i, t);
+            }
+        }
     }
 
     @Override
     protected void onDraw(Canvas canvas){
-        if(canvas != null){
+        if(canvas != null && ResourceManager.getInstance().scaledImagesLoaded){
             Bitmap selectedTileBitmap = null;
             canvas.drawColor(Color.BLACK);
             for(int i = 0; i < Tiles.size(); i++){
                 Bitmap b;
                 Tile t = Tiles.get(i);
-                switch (t.Type){
-                    case 0: b = a1Scaled;
-                        break;
-                    case 1: b = a2Scaled;
-                        break;
-                    case 2: b = a3Scaled;
-                        break;
-                    case 3: b = a4Scaled;
-                        break;
-                    case 4: b = a5Scaled;
-                        break;
-                    case 5: b = a6Scaled;
-                        break;
-                    case 6: b = a7Scaled;
-                        break;
-                    case 7: b = a8Scaled;
-                        break;
-                    case 8: b = a9Scaled;
-                        break;
-                    default:
-                        b = a1Scaled;
+                double jumpModifier = 0;
+                if(t.Selected){
+                    jumpModifier = Math.cos(t.jumpPhase) * tileWidth / 6;
                 }
+                b = ResourceManager.getInstance().tileImages.get(t.Type);
                 if(SelectedTileIndex != i) {
-                    canvas.drawBitmap(b, screenDw + t.Column * tileWidth + t.dX, screenDh + t.Row * tileWidth + t.dY, null);
+                    if(jumpModifier < 0) {
+                        canvas.drawBitmap(b, screenDw + t.Column * tileWidth + t.dX, screenDh + t.Row * tileWidth + t.dY + (int) jumpModifier, null);
+                    } else {
+                        canvas.drawBitmap(b, null,
+                                new Rect(
+                                        screenDw + t.Column * tileWidth + t.dX - (int)(jumpModifier / 4),
+                                        screenDh + t.Row * tileWidth + (int)(jumpModifier / 2) + t.dY,
+                                        screenDw + t.Column * tileWidth + tileWidth + t.dX + (int)(jumpModifier / 4),
+                                        screenDh + t.Row * tileWidth + tileWidth + t.dY),
+                                null);
+                    }
                 } else {
                     selectedTileBitmap = b;
                 }
+
             }
             if(SelectedTileIndex >= 0 && selectedTileBitmap != null){
                 Tile t = Tiles.get(SelectedTileIndex);
@@ -181,26 +158,38 @@ public class GameView extends SurfaceView {
                     Tile t = Tiles.get(SelectedTileIndex);
                     t.dX = t.dX + (x - prevX);
                     t.dY = t.dY + (y - prevY);
+                    t.Selected = false;
                     Tiles.set(SelectedTileIndex, t);
                 }
                 break;
             case MotionEvent.ACTION_DOWN:
-                moveTileCol = Math.min((int)Math.floor((x - screenDw) / tileWidth), COLUMNS - 1);
-                moveTileRow = Math.min((int)Math.floor((y - screenDh) / tileWidth), COLUMNS - 1);
+                moveTileCol = (int)Math.floor((x - screenDw) / tileWidth);
+                moveTileRow = (int)Math.floor((y - screenDh) / tileWidth);
+
                 for(int i = 0; i < Tiles.size(); i++){
                     Tile t = Tiles.get(i);
-                    if(t.Column == moveTileCol && t.Row == moveTileRow){
-                        SelectedTileIndex = i;
-                        break;
+                    if(t.Selected){
+                        t.Selected = false;
+                        Tiles.set(i, t);
                     }
                 }
+                SelectedTileIndex = gField.getTileId(moveTileRow, moveTileCol);
+
                 break;
             case MotionEvent.ACTION_UP:
                 if(SelectedTileIndex >= 0) {
                     Tile t = Tiles.get(SelectedTileIndex);
+                    if(Math.abs(t.dX)< 10  && Math.abs(t.dY) < 10) {
+                        t.Selected = !t.Selected;
+                        t.jumpPhase = 0;
+                    }
+                    else {
+                        t.Selected = false;
+                    }
                     t.dX = 0;
                     t.dY = 0;
                     Tiles.set(SelectedTileIndex, t);
+
                     SelectedTileIndex = -1;
                 }
                 break;
@@ -216,6 +205,7 @@ public class GameView extends SurfaceView {
         sw = width;
         sh = height;
         tileWidth = Math.min(sw, sh) / COLUMNS;
+        ResourceManager.getInstance().scaleImages(tileWidth);
         if (sw > sh){
             screenDh = 0;
             screenDw = (sw - sh)/2;

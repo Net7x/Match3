@@ -4,15 +4,17 @@ import android.graphics.Canvas;
 
 public class GameLoop extends Thread {
     private GameView view;
+    private long oldTime;
     static private long FPS = 15;
     private boolean running = false;
-    boolean isPaused;
+    private boolean isPaused;
 
     public GameLoop(GameView view){
         this.view = view;
     }
 
     public void SetRunning(boolean run){
+        oldTime = System.currentTimeMillis();
         running = run;
     }
 
@@ -26,22 +28,27 @@ public class GameLoop extends Thread {
     public void run() {
         super.run();
         long frameMs = 1000/FPS;
-        long startTime = 0;
+        long startTime;
         long sleepTime;
+        double delta;
 
         while(running){
+            startTime = System.currentTimeMillis();
             if(isPaused){
                 try {
-                    this.sleep(50);
+                    sleep(50);
                 } catch (InterruptedException ex){
                     ex.printStackTrace();
                 }
             } else {
                 Canvas c = null;
-                startTime = System.currentTimeMillis();
+                //startTime = System.currentTimeMillis();
                 try {
                     c = view.getHolder().lockCanvas();
                     synchronized (view.getHolder()){
+                        //newTime = System.currentTimeMillis();
+                        delta = startTime - oldTime;
+                        view.update(delta/1000);
                         view.onDraw(c);
                     }
                 } finally {
@@ -60,6 +67,8 @@ public class GameLoop extends Thread {
             } catch (Exception e){
                 e.printStackTrace();
             }
+            oldTime = startTime;
         }
+
     }
 }

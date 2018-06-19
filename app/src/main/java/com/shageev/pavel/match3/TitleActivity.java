@@ -19,6 +19,7 @@ public class TitleActivity extends Activity {
         super.onStart();
 
         final Activity current = this;
+        ResourceManager.getInstance().loadImages(current.getResources());
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -27,6 +28,6 @@ public class TitleActivity extends Activity {
                 Intent intent = new Intent(current, MainMenuActivity.class);
                 startActivity(intent);
             }
-        }, 2000);
+        }, 1000);
     }
 }
