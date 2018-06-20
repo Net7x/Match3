@@ -3,44 +3,40 @@ package com.shageev.pavel.match3;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-import java.util.ArrayList;
-import java.util.Random;
+import static com.shageev.pavel.match3.GameMode.*;
+
+enum GameMode{Selection, Swap, SwapBack, OnHold}
 
 public class GameView extends SurfaceView {
     GameLoop gameLoop;
-    private SurfaceHolder holder;
     int sw,sh, screenDw, screenDh;
     int tileWidth;
-    Bitmap a1,a2,a3,a4,a5,a6,a7,a8,a9;
-    Bitmap a1Scaled, a2Scaled, a3Scaled, a4Scaled, a5Scaled, a6Scaled, a7Scaled, a8Scaled, a9Scaled;
     private GameView thisView;
     private int COLUMNS = 7;
     private int MOVE_THRESHOLD = 20;
-    Random r = new Random();
+    private int SWAP_STEP = 700;
+    private int JUMP_SPEED = 15;
     int[][] gameField;
     GameField gField;
     int moveTileCol, moveTileRow;
     int prevX, prevY;
-    int deltaX, deltaY;
-    //ArrayList<Tile> Tiles;
     int SelectedTileIndex;
     Rect transformRect = new Rect();
+    private GameMode gameMode;
+    Tile swapFrom, swapTo;
 
     public GameView(Context context){
         super(context);
         thisView = this;
-        //gameLoop = new GameLoop(this);
-        holder = getHolder();
+        SurfaceHolder holder = getHolder();
 
         gameField = new int[][]{
                 { 1, 2, 1, 0, 1, 1, 0, 2 },
@@ -67,6 +63,7 @@ public class GameView extends SurfaceView {
                 gameLoop = new GameLoop(thisView);
                 gameLoop.SetRunning(true);
                 gameLoop.start();
+                gameMode = Selection;
             }
 
             @Override
@@ -78,6 +75,7 @@ public class GameView extends SurfaceView {
             public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
                 gameLoop.SetRunning(false);
                 gameLoop.getThreadGroup().interrupt();
+                gameMode = OnHold;
             }
         });
 
@@ -87,12 +85,152 @@ public class GameView extends SurfaceView {
     }
 
     protected void update(double modifier){
-        for(int i = 0; i < gField.Tiles.size(); i++){
-            Tile t = gField.Tiles.get(i);
-            if(t.Selected){
-                t.jumpPhase += modifier * 10 ;
-                gField.Tiles.set(i, t);
-            }
+        int x1, y1, x2, y2;
+        int x1d, y1d, x2d, y2d;
+        int x1n, y1n, x2n, y2n;
+        int direction;
+        switch(gameMode) {
+            case Selection:
+                for (int i = 0; i < gField.Tiles.size(); i++) {
+                    Tile t = gField.Tiles.get(i);
+                    if (t.Selected) {
+                        t.jumpPhase += modifier * JUMP_SPEED;
+                        gField.Tiles.set(i, t);
+                    }
+                }
+                break;
+            case Swap:
+                //current tile positions
+                x1 = screenDw + swapFrom.Column * tileWidth + swapFrom.dX;
+                y1 = screenDh + swapFrom.Row * tileWidth + swapFrom.dY;
+                x2 = screenDw + swapTo.Column * tileWidth + swapTo.dX;
+                y2 = screenDh + swapTo.Row * tileWidth + swapTo.dY;
+
+                //tile destinations
+                x1d = screenDw + swapTo.Column * tileWidth;
+                y1d = screenDh + swapTo.Row * tileWidth;
+                x2d = screenDw + swapFrom.Column * tileWidth;
+                y2d = screenDh + swapFrom.Row * tileWidth;
+
+                //next step positions
+                if(Math.abs(x1d - x1) <= SWAP_STEP * modifier){
+                    x1n = x1d;
+                } else {
+                    if(x1 > x1d){
+                        direction = -1;
+                    } else {
+                        direction = 1;
+                    }
+                    x1n = x1 + (int)(SWAP_STEP * direction * modifier);
+                }
+                if(Math.abs(y1d - y1) <= SWAP_STEP * modifier){
+                    y1n = y1d;
+                } else {
+                    if(y1 > y1d){
+                        direction = -1;
+                    } else {
+                        direction = 1;
+                    }
+                    y1n = y1 + (int)(SWAP_STEP * direction * modifier);
+                }
+                if(Math.abs(x2d - x2) <= SWAP_STEP * modifier){
+                    x2n = x2d;
+                } else {
+                    if(x2 > x2d){
+                        direction = -1;
+                    } else {
+                        direction = 1;
+                    }
+                    x2n = x2 + (int)(SWAP_STEP * direction * modifier);
+                }
+                if(Math.abs(y2d - y2) <= SWAP_STEP * modifier){
+                    y2n = y2d;
+                } else {
+                    if(y2 > y2d){
+                        direction = -1;
+                    } else {
+                        direction = 1;
+                    }
+                    y2n = y2 + (int)(SWAP_STEP * direction * modifier);
+                }
+
+                swapFrom.dX += x1n - x1;
+                swapFrom.dY += y1n - y1;
+                swapTo.dX += x2n - x2;
+                swapTo.dY += y2n - y2;
+                gField.Tiles.set(gField.Tiles.indexOf(swapFrom), swapFrom);
+                gField.Tiles.set(gField.Tiles.indexOf(swapTo), swapTo);
+
+                if(x1d == x1n && y1d == y1n && x2d == x2n && y2d == y2n){
+                    gameMode = SwapBack;
+                }
+                break;
+            case SwapBack:
+                //current tile positions
+                x1 = screenDw + swapFrom.Column * tileWidth + swapFrom.dX;
+                y1 = screenDh + swapFrom.Row * tileWidth + swapFrom.dY;
+                x2 = screenDw + swapTo.Column * tileWidth + swapTo.dX;
+                y2 = screenDh + swapTo.Row * tileWidth + swapTo.dY;
+
+                //tile destinations
+                x1d = screenDw + swapFrom.Column * tileWidth;
+                y1d = screenDh + swapFrom.Row * tileWidth;
+                x2d = screenDw + swapTo.Column * tileWidth;
+                y2d = screenDh + swapTo.Row * tileWidth;
+
+                //next step positions
+                if(Math.abs(x1d - x1) <= SWAP_STEP * modifier){
+                    x1n = x1d;
+                } else {
+                    if(x1 > x1d){
+                        direction = -1;
+                    } else {
+                        direction = 1;
+                    }
+                    x1n = x1 + (int)(SWAP_STEP * direction * modifier);
+                }
+                if(Math.abs(y1d - y1) <= SWAP_STEP * modifier){
+                    y1n = y1d;
+                } else {
+                    if(y1 > y1d){
+                        direction = -1;
+                    } else {
+                        direction = 1;
+                    }
+                    y1n = y1 + (int)(SWAP_STEP * direction * modifier);
+                }
+                if(Math.abs(x2d - x2) <= SWAP_STEP * modifier){
+                    x2n = x2d;
+                } else {
+                    if(x2 > x2d){
+                        direction = -1;
+                    } else {
+                        direction = 1;
+                    }
+                    x2n = x2 + (int)(SWAP_STEP * direction * modifier);
+                }
+                if(Math.abs(y2d - y2) <= SWAP_STEP * modifier){
+                    y2n = y2d;
+                } else {
+                    if(y2 > y2d){
+                        direction = -1;
+                    } else {
+                        direction = 1;
+                    }
+                    y2n = y2 + (int)(SWAP_STEP * direction * modifier);
+                }
+
+                swapFrom.dX += x1n - x1;
+                swapFrom.dY += y1n - y1;
+                swapTo.dX += x2n - x2;
+                swapTo.dY += y2n - y2;
+                gField.Tiles.set(gField.Tiles.indexOf(swapFrom), swapFrom);
+                gField.Tiles.set(gField.Tiles.indexOf(swapTo), swapTo);
+
+                if(x1d == x1n && y1d == y1n && x2d == x2n && y2d == y2n){
+                    gameMode = Selection;
+                }
+                break;
         }
     }
 
@@ -123,6 +261,12 @@ public class GameView extends SurfaceView {
         }
     }
 
+    private void swapMode(Tile from, Tile to){
+        gameMode = Swap;
+        swapFrom = from;
+        swapTo = to;
+    }
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         int x = (int)event.getX();
@@ -130,40 +274,45 @@ public class GameView extends SurfaceView {
 
         switch(event.getAction()){
             case MotionEvent.ACTION_MOVE:
-                if(SelectedTileIndex >= 0){
+                if(SelectedTileIndex >= 0 && gameMode == Selection){
                     Tile t = gField.Tiles.get(SelectedTileIndex);
                     t.dX = t.dX + (x - prevX);
                     t.dY = t.dY + (y - prevY);
+                    Tile moveTo = gField.getNeighbour(t.Column, t.Row, t.dX, t.dY, MOVE_THRESHOLD);
                     if(Math.abs(t.dX) > MOVE_THRESHOLD || Math.abs(t.dY) > MOVE_THRESHOLD) {
                         t.Selected = false;
+                        if(moveTo != null){
+                            swapMode(t, moveTo);
+                        }
                     }
                     gField.Tiles.set(SelectedTileIndex, t);
                 }
                 break;
             case MotionEvent.ACTION_DOWN:
-                moveTileCol = (int)Math.floor((x - screenDw) / tileWidth);
-                moveTileRow = (int)Math.floor((y - screenDh) / tileWidth);
+                if(gameMode == Selection) {
+                    moveTileCol = (int) Math.floor((x - screenDw) / tileWidth);
+                    moveTileRow = (int) Math.floor((y - screenDh) / tileWidth);
 
-                for(int i = 0; i < gField.Tiles.size(); i++){
-                    Tile t = gField.Tiles.get(i);
-                    if(t.Column == moveTileCol && t.Row == moveTileRow){
-                        t.Selected = !t.Selected;
-                        t.jumpPhase = 0;
-                        gField.Tiles.set(i, t);
-                    } else {
-                        if(t.Selected) {
-                            t.Selected = false;
+                    for (int i = 0; i < gField.Tiles.size(); i++) {
+                        Tile t = gField.Tiles.get(i);
+                        if (t.Column == moveTileCol && t.Row == moveTileRow) {
+                            t.Selected = !t.Selected;
                             t.jumpPhase = 0;
                             gField.Tiles.set(i, t);
+                        } else {
+                            if (t.Selected) {
+                                t.Selected = false;
+                                t.jumpPhase = 0;
+                                gField.Tiles.set(i, t);
+                            }
                         }
+
                     }
-
+                    SelectedTileIndex = gField.getTileId(moveTileRow, moveTileCol);
                 }
-                SelectedTileIndex = gField.getTileId(moveTileRow, moveTileCol);
-
                 break;
             case MotionEvent.ACTION_UP:
-                if(SelectedTileIndex >= 0) {
+                if(SelectedTileIndex >= 0 && gameMode == Selection) {
                     Tile t = gField.Tiles.get(SelectedTileIndex);
 
                     t.dX = 0;
