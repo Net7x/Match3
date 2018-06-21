@@ -59,4 +59,16 @@ public class ExampleUnitTest {
         assertEquals(23, gf.getTileType(3,1));
         assertEquals(-1, gf.getTileType(9,1));
     }
+
+    @Test
+    public void GameField_swap(){
+        GameField gf = initGameField();
+        Tile t1 = gf.Tiles.get(0);
+        Tile t2 = gf.Tiles.get(1);
+        int type1 = t1.Type;
+        int type2 = t2.Type;
+        gf.swap(t1, t2);
+        assertEquals(2, gf.Tiles.get(1).Type);
+        assertEquals(type2, gf.getTileType(0, 0));
+    }
 }

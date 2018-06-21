@@ -6,4 +6,5 @@ public class Tile {
     int dX, dY;
     public boolean Selected = false;
     public double jumpPhase;
+    public double explodePhase;
 }

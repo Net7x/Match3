@@ -5,6 +5,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
@@ -13,7 +14,7 @@ import android.view.SurfaceView;
 
 import static com.shageev.pavel.match3.GameMode.*;
 
-enum GameMode{Selection, Swap, SwapBack, OnHold}
+enum GameMode{Selection, Swap, SwapBack, Explode, FallDown, OnHold}
 
 public class GameView extends SurfaceView {
     GameLoop gameLoop;
@@ -24,6 +25,8 @@ public class GameView extends SurfaceView {
     private int MOVE_THRESHOLD = 20;
     private int SWAP_STEP = 700;
     private int JUMP_SPEED = 15;
+    private int EXPLODE_SPEED = 400;
+    private int EXPLODE_END = 100;
     int[][] gameField;
     GameField gField;
     int moveTileCol, moveTileRow;
@@ -43,7 +46,7 @@ public class GameView extends SurfaceView {
                 { 2, 1, 2, 1, 2, 0, 1, 2 },
                 { 8, 2, 1, 0, 2, 3, 4, 1 },
                 { 1, 3, 4, 6, 4, 1, 2, 1 },
-                { 0, 8, 3, 2, 0, 1, 7, 3 },
+                { 0, 8, 3, 2, 0, 6, 7, 3 },
                 { 1, 2, 1, 0, 6, 1, 0, 7 },
                 { 2, 3, 5, 1, 2, 0, 1, 2 },
                 { 8, 2, 1, 0, 2, 3, 4, 1 }
@@ -162,7 +165,25 @@ public class GameView extends SurfaceView {
                 gField.Tiles.set(gField.Tiles.indexOf(swapTo), swapTo);
 
                 if(x1d == x1n && y1d == y1n && x2d == x2n && y2d == y2n){
-                    gameMode = SwapBack;
+                    int fromDx = swapFrom.dX;
+                    int fromDy = swapFrom.dY;
+                    int toDx = swapTo.dX;
+                    int toDy = swapTo.dY;
+                    gField.swap(swapFrom, swapTo);
+                    if(gField.match()){
+                        //убрать лишние
+                        gameMode = Explode;
+                        SelectedTileIndex = -1;
+                    } else {
+                        gField.swap(swapFrom, swapTo);
+                        swapFrom.dX = fromDx;
+                        swapFrom.dY = fromDy;
+                        swapTo.dX = toDx;
+                        swapTo.dY = toDy;
+                        gField.Tiles.set(gField.Tiles.indexOf(swapFrom), swapFrom);
+                        gField.Tiles.set(gField.Tiles.indexOf(swapTo), swapTo);
+                        gameMode = SwapBack;
+                    }
                 }
                 break;
             case SwapBack:
@@ -228,7 +249,41 @@ public class GameView extends SurfaceView {
                 gField.Tiles.set(gField.Tiles.indexOf(swapTo), swapTo);
 
                 if(x1d == x1n && y1d == y1n && x2d == x2n && y2d == y2n){
+                    gField.clearSelected();
+
                     gameMode = Selection;
+                }
+                break;
+            case Explode:
+                boolean finishExplosions = true;
+                for(int i = 0; i < COLUMNS; i++){
+                    for(int j = 0; j < COLUMNS; j++){
+                        if(gField.getRemoveState(i, j)){
+                            Tile t = gField.getTile(i, j);
+                            t.explodePhase += EXPLODE_SPEED * modifier;
+                            if(t.explodePhase >= EXPLODE_END){
+                                t.explodePhase = EXPLODE_END;
+                            } else {
+                                finishExplosions = false;
+                            }
+                            gField.Tiles.set(gField.Tiles.indexOf(t), t);
+
+                        }
+                    }
+                }
+                if(finishExplosions){
+                    gField.moveDown(tileWidth);
+                    gameMode = FallDown;
+                }
+                break;
+            case FallDown:
+                //TODO: оставшиеся мячи падают на место взорванных
+                if(!gField.fall(modifier)) {
+                    if(gField.match()){
+                        gameMode = Explode;
+                    } else {
+                        gameMode = Selection;
+                    }
                 }
                 break;
         }
@@ -242,12 +297,20 @@ public class GameView extends SurfaceView {
                 Bitmap b;
                 Tile t = gField.Tiles.get(i);
                 double jumpModifier = 0;
+
                 if(t.Selected){
-                    jumpModifier = Math.cos(t.jumpPhase) * tileWidth / 6;
+                    jumpModifier = Math.sin(t.jumpPhase) * tileWidth / 6;
                 }
                 b = ResourceManager.getInstance().tileImages.get(t.Type);
 
-                if(jumpModifier <= 0) {
+                if(t.explodePhase > 0){
+                    transformRect.set(
+                            screenDw + t.Column * tileWidth + t.dX + (int)(tileWidth / 2 * t.explodePhase / EXPLODE_END),
+                            screenDh + t.Row * tileWidth + (int)(tileWidth / 2 * t.explodePhase / EXPLODE_END) + t.dY,
+                            screenDw + t.Column * tileWidth + tileWidth + t.dX - (int)(tileWidth / 2 * t.explodePhase / EXPLODE_END),
+                            screenDh + t.Row * tileWidth + tileWidth - (int)(tileWidth / 2 * t.explodePhase / EXPLODE_END) + t.dY);
+                    canvas.drawBitmap(b, null, transformRect, null);
+                } else if(jumpModifier <= 0) {
                     canvas.drawBitmap(b, screenDw + t.Column * tileWidth + t.dX, screenDh + t.Row * tileWidth + t.dY + (int) jumpModifier, null);
                 } else {
                     transformRect.set(
@@ -258,6 +321,27 @@ public class GameView extends SurfaceView {
                     canvas.drawBitmap(b, null, transformRect, null);
                 }
             }
+            //show some internal arrays
+//            int size = 20;
+//            Paint textPaint = new Paint();
+//            textPaint.setColor(Color.WHITE);
+//            textPaint.setTextSize(size);
+//            for(int i = 0; i < COLUMNS; i++){
+//                for(int j = 0; j < COLUMNS; j++){
+//                    canvas.drawText(String.valueOf(gField.getTileId(j, i)), i * size * 2, 3* size +j * size * 2, textPaint);
+//
+//                    canvas.drawText(String.valueOf(gField.getTileType(j,i)), size * 2 * (COLUMNS + 2)+ i * size * 2, 3*size + j * size * 2, textPaint);
+//
+//                    for(int k = 0; k < gField.Tiles.size(); k++){
+//                        Tile t = gField.Tiles.get(k);
+//                        if(t.Column == i && t.Row == j){
+//                            canvas.drawText(String.valueOf(k), size * 2 * (2*COLUMNS + 4)+ i * size * 2, 3*size + j * size * 2, textPaint);
+//                            canvas.drawText(String.valueOf(t.Type), size * 2 * (3*COLUMNS + 6)+ i * size * 2, 3*size + j * size * 2, textPaint);
+//
+//                        }
+//                    }
+//                }
+//            }
         }
     }
 
@@ -265,6 +349,10 @@ public class GameView extends SurfaceView {
         gameMode = Swap;
         swapFrom = from;
         swapTo = to;
+        swapFrom.jumpPhase = 0;
+        swapTo.jumpPhase = 0;
+        gField.Tiles.set(gField.Tiles.indexOf(swapFrom), swapFrom);
+        gField.Tiles.set(gField.Tiles.indexOf(swapTo), swapTo);
     }
 
     @Override
@@ -301,9 +389,13 @@ public class GameView extends SurfaceView {
                             gField.Tiles.set(i, t);
                         } else {
                             if (t.Selected) {
-                                t.Selected = false;
-                                t.jumpPhase = 0;
-                                gField.Tiles.set(i, t);
+                                if(gField.isNeighbour(t, moveTileRow, moveTileCol)) {
+                                    swapMode(t, gField.getTile(moveTileRow, moveTileCol));
+                                } else {
+                                    t.Selected = false;
+                                    t.jumpPhase = 0;
+                                    gField.Tiles.set(i, t);
+                                }
                             }
                         }
 
