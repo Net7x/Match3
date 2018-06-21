@@ -133,18 +133,23 @@ public class GameField {
     }
 
     public void moveDown(int rowSize){
-        for(int r = cols - 2; r >= 0; r--){
-            for(int c = 0; c < cols; c++){
-                if(getRemoveState(r + 1,c)){
-                    Tile t = getTile(r, c);
-                    int dY = t.dY;
-                    swap(t, getTile(r+1, c));
-                    Tile f = getTile(r + 1, c);
-                    f.dY = dY - rowSize;
-                    Tiles.set(Tiles.indexOf(f), f);
+        boolean changed;
+        do {
+            changed = false;
+            for (int r = cols - 2; r >= 0; r--) {
+                for (int c = 0; c < cols; c++) {
+                    if (getRemoveState(r + 1, c)) {
+                        Tile t = getTile(r, c);
+                        int dY = t.dY;
+                        swap(t, getTile(r + 1, c));
+                        Tile f = getTile(r + 1, c);
+                        f.dY = dY - rowSize;
+                        Tiles.set(Tiles.indexOf(f), f);
+                        changed = true;
+                    }
                 }
             }
-        }
+        }while(changed);
         //add new balls
         for(int r = 0; r < cols; r++) {
             for(int c = 0; c < cols; c++){
