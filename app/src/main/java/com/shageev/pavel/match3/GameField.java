@@ -134,6 +134,7 @@ public class GameField {
 
     public void moveDown(int rowSize){
         boolean changed;
+        int firstRow = 0;
         do {
             changed = false;
             for (int r = cols - 2; r >= 0; r--) {
@@ -146,18 +147,20 @@ public class GameField {
                         f.dY = dY - rowSize;
                         Tiles.set(Tiles.indexOf(f), f);
                         changed = true;
+                        firstRow = r;
                     }
                 }
             }
         }while(changed);
         //add new balls
+
         for(int r = 0; r < cols; r++) {
             for(int c = 0; c < cols; c++){
                 if(getRemoveState(r, c)){
                     Tile t = getTile(r,c);
                     t.Type = (int)(Math.random() * 5);
                     t.dX = 0;
-                    t.dY = - (c + 1) * rowSize;
+                    t.dY = - (firstRow + 1) * rowSize;
                     t.explodePhase = 0;
                     Tiles.set(Tiles.indexOf(t), t);
                     removeTile[r][c] = 0;

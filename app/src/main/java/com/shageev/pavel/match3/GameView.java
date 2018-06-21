@@ -296,6 +296,10 @@ public class GameView extends SurfaceView {
             for(int i = 0; i < gField.Tiles.size(); i++){
                 Bitmap b;
                 Tile t = gField.Tiles.get(i);
+                //if tile higher than board - skip it
+                if(t.Row * tileWidth + t.dY < - tileWidth)
+                    continue;
+
                 double jumpModifier = 0;
 
                 if(t.Selected){
