@@ -138,7 +138,7 @@ public class GameField {
             changed = false;
             for (int r = cols - 2; r >= 0; r--) {
                 for (int c = 0; c < cols; c++) {
-                    if (getRemoveState(r + 1, c)) {
+                    if (getRemoveState(r + 1, c) && !getRemoveState(r,c)) {
                         Tile t = getTile(r, c);
                         int dY = t.dY;
                         swap(t, getTile(r + 1, c));
