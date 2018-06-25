@@ -19,4 +19,9 @@ public class MainMenuActivity extends Activity {
         Intent intent = new Intent(this, ClassicGame.class);
         startActivity(intent);
     }
+
+    public void resetGame(View view){
+        Intent intent = new Intent(this, ClassicGame.class);
+        startActivity(intent);
+    }
 }

@@ -1,7 +1,11 @@
 package com.shageev.pavel.match3;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class GameField {
     public ArrayList<Tile> Tiles;
@@ -9,11 +13,34 @@ public class GameField {
     private int[][] tileTypes;
     private int cols;
     private int[][] removeTile;
+    public int availableMoves;
+    public int[] resCount;
+    public long score;
+    public int scoreSeqModifier = 1;
 
     public GameField(int columns){
         cols = columns;
+        resCount = new int[Constants.BALL_TYPES];
         tileIDs = new int[columns][columns];
         tileTypes = new int[columns][columns];
+    }
+
+    public void init(){
+        Tiles = new ArrayList<>();
+        for(int i = 0; i < cols; i++){
+            for(int j = 0; j < cols; j++){
+                Tile t = new Tile();
+                t.Column = j;
+                t.Row = i;
+                t.Type = (int)(Math.random() * Constants.BALL_TYPES);
+                t.dX = 0;
+                t.dY = 0;
+                Tiles.add(t);
+                tileIDs[i][j] = Tiles.indexOf(t);
+                tileTypes[i][j] = t.Type;
+            }
+        }
+        availableMoves = movesCount();
     }
 
     public void init(int[][] tiles){
@@ -31,16 +58,7 @@ public class GameField {
                 tileTypes[i][j] = t.Type;
             }
         }
-    }
-
-    private void resetTypeID(){
-        for(int i = 0; i < Tiles.size(); i++){
-
-            Tile t = Tiles.get(i);
-            tileIDs[t.Row][t.Column] = i;
-            tileTypes[t.Row][t.Column] = t.Type;
-
-        }
+        availableMoves = movesCount();
     }
 
     public int getTileId(int row, int col){
@@ -158,7 +176,10 @@ public class GameField {
             for(int c = 0; c < cols; c++){
                 if(getRemoveState(r, c)){
                     Tile t = getTile(r,c);
-                    t.Type = (int)(Math.random() * 5);
+                    resCount[t.Type]++;
+                    //TODO: change score increment rules
+                    score += scoreForType(t.Type) * scoreSeqModifier;
+                    t.Type = (int)(Math.random() * Constants.BALL_TYPES);
                     t.dX = 0;
                     t.dY = - (firstRow + 1) * rowSize;
                     t.explodePhase = 0;
@@ -169,6 +190,7 @@ public class GameField {
             }
 
         }
+        availableMoves = movesCount();
     }
 
     public boolean fall(double modifier){
@@ -207,29 +229,29 @@ public class GameField {
         for(int i = 0; i < cols; i++){
             for(int j = 0; j < cols; j++){
                 if(removeTile[i][j] == 0) {
-                    int n = 0;
+                    int h = 0, v = 0;
                     if (i > 0) {
                         //check up
                         if (tileTypes[i][j] == tileTypes[i - 1][j])
-                            n++;
+                            h++;
                     }
                     if (j > 0) {
                         //check left
                         if (tileTypes[i][j] == tileTypes[i][j - 1])
-                            n++;
+                            v++;
                     }
                     if (i < cols - 1) {
                         // check bottom
                         if (tileTypes[i][j] == tileTypes[i + 1][j])
-                            n++;
+                            h++;
                     }
                     if (j < cols - 1) {
                         //check right
                         if (tileTypes[i][j] == tileTypes[i][j + 1])
-                            n++;
+                            v++;
                     }
                     //neighbours[i][j] = n;
-                    if (n > 1) {
+                    if (h > 1 || v > 1) {
                         result = true;
                         checkNeighbours(i, j, tileTypes[i][j]);
                     }
@@ -237,6 +259,108 @@ public class GameField {
             }
         }
         return result;
+    }
+
+    private boolean hasMoves(int[][]array){
+        for(int r = 0; r < cols; r++){
+            for(int c = 0; c < cols; c++){
+                int h = 0, v = 0;
+                if (r > 0) {
+                    //check up
+                    if (array[r][c] == array[r - 1][c])
+                        h++;
+                }
+                if (c > 0) {
+                    //check left
+                    if (array[r][c] == array[r][c - 1])
+                        v++;
+                }
+                if (r < cols - 1) {
+                    // check bottom
+                    if (array[r][c] == array[r + 1][c])
+                        h++;
+                }
+                if (c < cols - 1) {
+                    //check right
+                    if (array[r][c] == array[r][c + 1])
+                        v++;
+                }
+                //neighbours[i][j] = n;
+                if (h > 1 || v > 1) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private int movesCount(){
+        int count = 0;
+        int[][] types = new int[cols][cols];
+        StringBuilder arr = new StringBuilder();
+        for(int r = 0; r < cols; r++){
+            for(int c = 0; c < cols; c++){
+                types[r][c] = tileTypes[r][c];
+                arr.append(types[r][c]);
+            }
+        }
+        Log.i("Match3", "Tile Types: "+ arr.toString());
+        StringBuilder matches = new StringBuilder();
+        for(int r = 0; r < cols - 1; r++){
+            for(int c = 0; c < cols - 1; c++){
+                //swap down
+                int temp = types[r][c];
+                types[r][c] = types[r+1][c];
+                types[r+1][c] = temp;
+                //check matches
+                if(hasMoves(types)) {
+                    count++;
+                    matches.append("(").append(r).append("+:").append(c).append(")");
+                }
+                //reverse swap
+                types[r+1][c] = types[r][c];
+                //types[r][c] = temp;
+
+                //swap right
+                types[r][c] = types[r][c+1];
+                types[r][c+1] = temp;
+
+                //check matches
+                if(hasMoves(types)) {
+                    count++;
+                    matches.append("(").append(r).append(":").append(c).append("+)");
+                }
+                //reverse swap
+                types[r][c+1] = types[r][c];
+                types[r][c] = temp;
+            }
+        }
+        //two last swaps for types[cols-1][cols-1]
+        //swap up
+        int temp = types[cols-1][cols-1];
+        types[cols-1][cols-1] = types[cols-2][cols-1];
+        types[cols-2][cols-1] = temp;
+        //check matches
+        if(hasMoves(types)) {
+            count++;
+            matches.append("(").append(cols-1).append("-:").append(cols-1).append(")");
+        }
+        //reverse swap
+        types[cols-2][cols-1] = types[cols-1][cols-1];
+        //types[cols-1][col1-1] = temp;
+
+        //swap left
+        types[cols-1][cols-1] = types[cols-1][cols-2];
+        types[cols-1][cols-2] = temp;
+
+        //check matches
+        if(hasMoves(types)) {
+            matches.append("(").append(cols-1).append(":").append(cols-1).append("-)");
+            count++;
+        }
+        //don't neet put it back as array its local
+        Log.i("Match3", "Matches: "+matches.toString());
+        return count;
     }
 
     private void checkNeighbours(int i, int j, int type){
@@ -265,6 +389,83 @@ public class GameField {
             if(removeTile[i][j+1] == 0 && tileTypes[i][j+1] == type){
                 checkNeighbours(i, j+1, type);
             }
+        }
+    }
+
+    public void saveTiles(){
+        StringBuilder encoded = new StringBuilder();
+        for(int r = 0; r < cols; r++){
+            for(int c = 0; c < cols; c++)
+            encoded.append(getTileType(r, c));
+        }
+        ResourceManager.getInstance().prefSaveString("tiles", encoded.toString());
+        saveResources();
+        saveScore();
+    }
+
+    public void saveResources(){
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < resCount.length; i++){
+            sb.append(resCount[i]);
+            if(i < resCount.length - 1)
+                sb.append("|");
+        }
+        ResourceManager.getInstance().prefSaveString("res", sb.toString());
+
+    }
+
+    public void saveScore(){
+        ResourceManager.getInstance().prefSaveLong("score", score);
+    }
+
+    public void loadTiles(){
+        String encoded;
+        encoded = ResourceManager.getInstance().prefGetString("tiles");
+        if(encoded.length() == cols * cols){
+            for(int r = 0; r < cols; r++) {
+                for (int c = 0; c < cols; c++) {
+                    Tile t = getTile(r, c);
+                    t.Type = Integer.parseInt(encoded.substring(r * cols + c, r*cols + c + 1));
+                    tileTypes[r][c] = t.Type;
+                    Tiles.set(Tiles.indexOf(t), t);
+                }
+            }
+        }
+        availableMoves = movesCount();
+        loadResources();
+        loadScore();
+    }
+
+    public void loadResources(){
+        String encoded = ResourceManager.getInstance().prefGetString("res");
+        String[] array = encoded.split("[|]");
+        for(int i = 0; i < array.length && i < Constants.BALL_TYPES; i++){
+            if(array[i].length() > 0)
+                resCount[i] = Integer.parseInt(array[i]);
+        }
+    }
+
+    public void loadScore(){
+        score = ResourceManager.getInstance().prefGetLong("score");
+    }
+
+    public boolean saveExists(){
+        String save = ResourceManager.getInstance().prefGetString("tiles");
+        return save.length() == cols * cols;
+    }
+
+    public int scoreForType(int t){
+        int s = resCount[t];
+        if( s < 10 ){
+            return 1;
+        } else if (s < 100) {
+            return 5;
+        } else if (s < 1000) {
+            return 10;
+        } else if (s < 10000) {
+            return 50;
+        } else {
+            return 100;
         }
     }
 }

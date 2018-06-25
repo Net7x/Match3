@@ -10,18 +10,25 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 public class ClassicGame extends Activity {
+    private GameView gv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(new GameView(this));
-
+        gv = new GameView(this);
+        setContentView(gv);
+        ResourceManager.getInstance().initPrefs(this);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        ResourceManager.getInstance().loadImages(this.getResources());
-        ResourceManager.getInstance().scaleImages();
+        ResourceManager rm = ResourceManager.getInstance();
+        rm.loadImages(this.getResources());
+        rm.scaleImages();
+        if(gv == null){
+            gv = new GameView(this);
+        }
+
     }
 }

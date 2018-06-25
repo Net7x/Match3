@@ -2,6 +2,8 @@ package com.shageev.pavel.match3;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
+
 import static org.junit.Assert.*;
 
 /**
@@ -30,6 +32,7 @@ public class ExampleUnitTest {
         gf.init(data);
         return gf;
     }
+
 
     @Test
     public void GameField_getNeighbour(){

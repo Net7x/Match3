@@ -7,6 +7,8 @@ import android.support.test.runner.AndroidJUnit4;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.ArrayList;
+
 import static org.junit.Assert.*;
 
 /**
@@ -33,4 +35,5 @@ public class ExampleInstrumentedTest {
         rm.scaleImages(50);
         assertEquals(true, rm.tileImages.size() > 0);
     }
+
 }
