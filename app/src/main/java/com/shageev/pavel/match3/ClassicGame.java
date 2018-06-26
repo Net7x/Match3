@@ -15,8 +15,8 @@ public class ClassicGame extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        gv = new GameView(this);
-        setContentView(gv);
+        //gv = new GameView(this);
+        //setContentView(gv);
         ResourceManager.getInstance().initPrefs(this);
     }
 
@@ -28,6 +28,7 @@ public class ClassicGame extends Activity {
         rm.scaleImages();
         if(gv == null){
             gv = new GameView(this);
+            setContentView(gv);
         }
 
     }
