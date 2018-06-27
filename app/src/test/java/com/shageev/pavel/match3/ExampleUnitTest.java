@@ -1,16 +1,24 @@
 package com.shageev.pavel.match3;
 
+import android.util.Log;
+
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
 
 import static org.junit.Assert.*;
-
+import org.junit.Before;
+import org.junit.runner.RunWith;
+import org.mockito.Matchers;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
 /**
  * Example local unit test, which will execute on the development machine (host).
  *
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
+
 public class ExampleUnitTest {
     @Test
     public void addition_isCorrect() {
@@ -19,7 +27,7 @@ public class ExampleUnitTest {
 
 
     public GameField initGameField(){
-        GameField gf = new GameField(7);
+        GameField gf = new GameField(7, GameType.Medium);
         int[][] data = new int[][]{
                 {  1,  2,  3,  4,  5,  6,  7 },
                 {  8,  9, 10, 11, 12, 13, 14 },
@@ -73,5 +81,11 @@ public class ExampleUnitTest {
         gf.swap(t1, t2);
         assertEquals(2, gf.Tiles.get(1).Type);
         assertEquals(type2, gf.getTileType(0, 0));
+    }
+
+    @Test
+    public void GameType_Test(){
+        GameType gType = GameType.Medium;
+        assertEquals("Medium", gType.toString());
     }
 }

@@ -13,14 +13,16 @@ public class GameField {
     private int[][] tileTypes;
     private int cols;
     private int[][] removeTile;
+    private GameType gType;
     public int availableMoves;
     public int[] resCount;
     public long score;
     public int scoreSeqModifier = 1;
 
-    public GameField(int columns){
+    public GameField(int columns, GameType gType){
         cols = columns;
-        resCount = new int[Constants.BALL_TYPES];
+        this.gType = gType;
+        resCount = new int[Constants.BallTypes(gType)];
         tileIDs = new int[columns][columns];
         tileTypes = new int[columns][columns];
     }
@@ -32,7 +34,7 @@ public class GameField {
                 Tile t = new Tile();
                 t.Column = j;
                 t.Row = i;
-                t.Type = (int)(Math.random() * Constants.BALL_TYPES);
+                t.Type = (int)(Math.random() * Constants.BallTypes(gType));
                 t.dX = 0;
                 t.dY = 0;
                 Tiles.add(t);
@@ -179,7 +181,7 @@ public class GameField {
                     resCount[t.Type]++;
                     //TODO: change score increment rules
                     score += scoreForType(t.Type) * scoreSeqModifier;
-                    t.Type = (int)(Math.random() * Constants.BALL_TYPES);
+                    t.Type = (int)(Math.random() * Constants.BallTypes(gType));
                     t.dX = 0;
                     t.dY = - (firstRow + 1) * rowSize;
                     t.explodePhase = 0;
@@ -398,7 +400,7 @@ public class GameField {
             for(int c = 0; c < cols; c++)
             encoded.append(getTileType(r, c));
         }
-        ResourceManager.getInstance().prefSaveString("tiles", encoded.toString());
+        ResourceManager.getInstance().prefSaveString("tiles" + gType.toString(), encoded.toString());
         saveResources();
         saveScore();
     }
@@ -410,17 +412,17 @@ public class GameField {
             if(i < resCount.length - 1)
                 sb.append("|");
         }
-        ResourceManager.getInstance().prefSaveString("res", sb.toString());
+        ResourceManager.getInstance().prefSaveString("res"+gType.toString(), sb.toString());
 
     }
 
     public void saveScore(){
-        ResourceManager.getInstance().prefSaveLong("score", score);
+        ResourceManager.getInstance().prefSaveLong("score"+gType.toString(), score);
     }
 
     public void loadTiles(){
         String encoded;
-        encoded = ResourceManager.getInstance().prefGetString("tiles");
+        encoded = ResourceManager.getInstance().prefGetString("tiles"+gType.toString());
         if(encoded.length() == cols * cols){
             for(int r = 0; r < cols; r++) {
                 for (int c = 0; c < cols; c++) {
@@ -437,20 +439,21 @@ public class GameField {
     }
 
     public void loadResources(){
-        String encoded = ResourceManager.getInstance().prefGetString("res");
+        String encoded = ResourceManager.getInstance().prefGetString("res"+gType.toString());
         String[] array = encoded.split("[|]");
-        for(int i = 0; i < array.length && i < Constants.BALL_TYPES; i++){
+        for(int i = 0; i < array.length && i < Constants.BallTypes(gType); i++){
             if(array[i].length() > 0)
                 resCount[i] = Integer.parseInt(array[i]);
         }
     }
 
     public void loadScore(){
-        score = ResourceManager.getInstance().prefGetLong("score");
+
+        score = ResourceManager.getInstance().prefGetLong("score"+gType.toString());
     }
 
     public boolean saveExists(){
-        String save = ResourceManager.getInstance().prefGetString("tiles");
+        String save = ResourceManager.getInstance().prefGetString("tiles"+gType.toString());
         return save.length() == cols * cols;
     }
 

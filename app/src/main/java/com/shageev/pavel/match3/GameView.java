@@ -15,6 +15,7 @@ import android.view.SurfaceView;
 import static com.shageev.pavel.match3.GameMode.*;
 
 enum GameMode{Selection, Swap, SwapBack, Explode, FallDown, OnHold}
+enum GameType{Easy,Medium,Hard}
 
 public class GameView extends SurfaceView {
     GameLoop gameLoop;
@@ -34,15 +35,17 @@ public class GameView extends SurfaceView {
     int SelectedTileIndex;
     Rect transformRect = new Rect();
     private GameMode gameMode;
+    private GameType gameType;
     Tile swapFrom, swapTo;
     private Paint resourceCounterPaint, scorePaint;
 
-    public GameView(Context context){
+    public GameView(Context context, GameType type){
         super(context);
         thisView = this;
+        gameType = type;
         SurfaceHolder holder = getHolder();
 
-        gField = new GameField(Constants.COLUMNS);
+        gField = new GameField(Constants.COLUMNS, gameType);
         gField.init();
 
         SelectedTileIndex = -1;
@@ -262,7 +265,7 @@ public class GameView extends SurfaceView {
                 }
             }
             //draw resources
-            int colSize = Math.min(sw, sh) / Constants.BALL_TYPES;
+            int colSize = Math.min(sw, sh) / Constants.BallTypes(gameType);
             for(int i = 0; i < gField.resCount.length; i++){
                 if(sw > sh){ //landscape
                     resourceCounterPaint.setTextAlign(Paint.Align.LEFT);
