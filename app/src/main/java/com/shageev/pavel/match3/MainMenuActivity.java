@@ -5,11 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.view.View;
 import android.widget.TextView;
-
-import org.w3c.dom.Text;
 
 public class MainMenuActivity extends Activity {
     private TextView scoreEasy, scoreMedium, scoreHard;

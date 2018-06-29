@@ -22,13 +22,6 @@ public class GameView extends SurfaceView {
     int sw,sh, screenDw, screenDh;
     int tileWidth;
     private GameView thisView;
-//    private int COLUMNS = 7;
-//    private int MOVE_THRESHOLD = 20;
-//    private int SWAP_STEP = 700;
-//    private int JUMP_SPEED = 15;
-//    private int EXPLODE_SPEED = 400;
-//    private int EXPLODE_END = 100;
-//    int[][] gameField;
     GameField gField;
     int moveTileCol, moveTileRow;
     int prevX, prevY;

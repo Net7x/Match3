@@ -1,18 +1,9 @@
 package com.shageev.pavel.match3;
 
-import android.util.Log;
-
 import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import java.util.ArrayList;
 
 import static org.junit.Assert.*;
-import org.junit.Before;
-import org.junit.runner.RunWith;
-import org.mockito.Matchers;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+
 /**
  * Example local unit test, which will execute on the development machine (host).
  *
@@ -26,7 +17,7 @@ public class ExampleUnitTest {
     }
 
 
-    public GameField initGameField(){
+    private GameField initGameField(){
         GameField gf = new GameField(7, GameType.Medium);
         int[][] data = new int[][]{
                 {  1,  2,  3,  4,  5,  6,  7 },

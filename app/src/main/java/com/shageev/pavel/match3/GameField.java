@@ -3,9 +3,6 @@ package com.shageev.pavel.match3;
 import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class GameField {
     public ArrayList<Tile> Tiles;
@@ -360,7 +357,7 @@ public class GameField {
             matches.append("(").append(cols-1).append(":").append(cols-1).append("-)");
             count++;
         }
-        //don't neet put it back as array its local
+        //don't need put it back as array its local
         Log.i("Match3", "Matches: "+matches.toString());
         return count;
     }
