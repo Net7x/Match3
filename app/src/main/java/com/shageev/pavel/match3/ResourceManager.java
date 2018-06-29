@@ -38,21 +38,21 @@ public class ResourceManager {
     }
 
     public void initPrefs(Activity activity){
-        prefs = activity.getPreferences(Context.MODE_PRIVATE);
+        prefs = activity.getSharedPreferences("Match3", Context.MODE_PRIVATE);
         Log.i("Match3","Preferences init");
     }
 
     public void prefSaveString(String key, String value){
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString(key, value);
-        editor.commit();
+        editor.apply();
         Log.i("Match3", "PrefS saved "+value);
     }
 
     public void prefSaveLong(String key, long value){
         SharedPreferences.Editor editor = prefs.edit();
         editor.putLong(key, value);
-        editor.commit();
+        editor.apply();
         Log.i("Match3", "PrefL saved "+value);
     }
 

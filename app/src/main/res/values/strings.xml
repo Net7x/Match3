@@ -3,4 +3,8 @@
     <string name="CompanyName1">PYC</string>
     <string name="CompanyName2">soft</string>
     <string name="pyc_soft_logo">PYC soft logo</string>
+    <string name="GameName">Match 3</string>
+    <string name="medium_mode">Expert</string>
+    <string name="hard_mode">Master</string>
+    <string name="easy_mode">Easy</string>
 </resources>

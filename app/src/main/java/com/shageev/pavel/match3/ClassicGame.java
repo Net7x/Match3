@@ -34,6 +34,5 @@ public class ClassicGame extends Activity {
             gv = new GameView(this, gType);
             setContentView(gv);
         }
-
     }
 }
