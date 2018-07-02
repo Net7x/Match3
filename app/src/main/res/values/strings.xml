@@ -2,7 +2,11 @@
     <string name="app_name">Match3</string>
     <string name="pyc_soft_logo">PYC soft logo</string>
     <string name="GameName">Match 3</string>
-    <string name="medium_mode">Expert</string>
-    <string name="hard_mode">Master</string>
-    <string name="easy_mode">Easy</string>
+    <string name="medium_mode">Go</string>
+    <string name="hard_mode">Go</string>
+    <string name="easy_mode">Go</string>
+    <string name="ball">ball</string>
+    <string name="master_label">Master</string>
+    <string name="expert_label">Expert</string>
+    <string name="easy_label">Easy</string>
 </resources>
