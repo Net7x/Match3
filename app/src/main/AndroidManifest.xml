@@ -9,15 +9,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
-        <activity android:name=".TitleActivity">
+        <activity android:name=".TitleActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainMenuActivity" />
-        <activity android:name=".ClassicGame" />
+        <activity android:name=".MainMenuActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".ClassicGame"
+            android:screenOrientation="portrait"/>
 
     </application>
 
