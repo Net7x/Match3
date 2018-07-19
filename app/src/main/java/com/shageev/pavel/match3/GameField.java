@@ -1,6 +1,9 @@
 package com.shageev.pavel.match3;
 
+import android.provider.SyncStateContract;
 import android.util.Log;
+
+import com.shageev.pavel.match3.Data.Resource;
 
 import java.util.ArrayList;
 
@@ -8,7 +11,7 @@ public class GameField {
     public ArrayList<Tile> Tiles;
     private int[][] tileIDs;
     private int[][] tileTypes;
-    private int cols;
+    public int cols;
     private int[][] removeTile;
     private GameType gType;
     public int availableMoves;
@@ -16,12 +19,12 @@ public class GameField {
     public long score;
     public int scoreSeqModifier = 1;
 
-    public GameField(int columns, GameType gType){
-        cols = columns;
+    public GameField(GameType gType){
+        cols = Constants.Columns(gType);
         this.gType = gType;
         resCount = new int[Constants.BallTypes(gType)];
-        tileIDs = new int[columns][columns];
-        tileTypes = new int[columns][columns];
+        tileIDs = new int[cols][cols];
+        tileTypes = new int[cols][cols];
     }
 
     public void init(){
@@ -169,15 +172,19 @@ public class GameField {
                 }
             }
         }while(changed);
+
         //add new balls
+        int[] resDelta = new int[resCount.length];
+        long scoreDelta = 0;
 
         for(int r = 0; r < cols; r++) {
             for(int c = 0; c < cols; c++){
                 if(getRemoveState(r, c)){
                     Tile t = getTile(r,c);
                     resCount[t.Type]++;
+                    resDelta[t.Type]++;
                     //TODO: change score increment rules
-                    score += scoreForType(t.Type) * scoreSeqModifier;
+                    scoreDelta += scoreForType(t.Type) * scoreSeqModifier;
                     t.Type = (int)(Math.random() * Constants.BallTypes(gType));
                     t.dX = 0;
                     t.dY = - (firstRow + 1) * rowSize;
@@ -187,8 +194,10 @@ public class GameField {
                     tileTypes[r][c] = t.Type;
                 }
             }
-
         }
+        score += scoreDelta;
+        ResourceManager.getInstance().hsRepo.insert(gType, System.currentTimeMillis(), resDelta);
+        ResourceManager.getInstance().hsRepo.insert(gType, System.currentTimeMillis(), scoreDelta);
         availableMoves = movesCount();
     }
 
@@ -200,6 +209,7 @@ public class GameField {
                 int inc = (int)(Constants.FALL_SPEED * modifier);
                 if(t.dY + inc >= 0){
                     t.dY = 0;
+                    t.fallenPhase = Math.PI;
                 } else {
                     t.dY += Constants.FALL_SPEED * modifier;
                     stillFalling = true;
@@ -210,6 +220,21 @@ public class GameField {
         return stillFalling;
     }
 
+    public void updateFallen(double modifier){
+        for(int i = 0; i < Tiles.size(); i++){
+            Tile t = Tiles.get(i);
+            if(t.fallenPhase > 0){
+                double delta = Constants.JUMP_SPEED * modifier;
+                if(t.fallenPhase - delta < 0){
+                    t.fallenPhase = 0;
+                } else {
+                    t.fallenPhase -= delta;
+                }
+                Tiles.set(i, t);
+            }
+        }
+    }
+
     public void clearSelected() {
         for(int i = 0; i < Tiles.size(); i++){
             Tile t = Tiles.get(i);
@@ -218,6 +243,12 @@ public class GameField {
                 Tiles.set(i, t);
             }
         }
+    }
+
+    public void matchAll(){
+        for(int i = 0; i < cols; i++)
+            for(int j = 0; j < cols; j++)
+                removeTile[i][j] = 1;
     }
 
     public boolean match(){
@@ -403,18 +434,19 @@ public class GameField {
     }
 
     public void saveResources(){
-        StringBuilder sb = new StringBuilder();
-        for(int i = 0; i < resCount.length; i++){
-            sb.append(resCount[i]);
-            if(i < resCount.length - 1)
-                sb.append("|");
-        }
-        ResourceManager.getInstance().prefSaveString("res"+gType.toString(), sb.toString());
+//        StringBuilder sb = new StringBuilder();
+//        for(int i = 0; i < resCount.length; i++){
+//            sb.append(resCount[i]);
+//            if(i < resCount.length - 1)
+//                sb.append("|");
+//        }
+//        ResourceManager.getInstance().prefSaveString("res"+gType.toString(), sb.toString());
 
+        //ResourceManager.getInstance().hsRepo.insert(gType, System.currentTimeMillis(), resCount);
     }
 
     public void saveScore(){
-        ResourceManager.getInstance().prefSaveLong("score"+gType.toString(), score);
+        //ResourceManager.getInstance().prefSaveLong("score"+gType.toString(), score);
     }
 
     public void loadTiles(){
@@ -436,17 +468,19 @@ public class GameField {
     }
 
     public void loadResources(){
-        String encoded = ResourceManager.getInstance().prefGetString("res"+gType.toString());
-        String[] array = encoded.split("[|]");
-        for(int i = 0; i < array.length && i < Constants.BallTypes(gType); i++){
-            if(array[i].length() > 0)
-                resCount[i] = Integer.parseInt(array[i]);
-        }
+        resCount = ResourceManager.getInstance().hsRepo.getResourcesDay(gType, System.currentTimeMillis());
+//        String encoded = ResourceManager.getInstance().prefGetString("res"+gType.toString());
+//        String[] array = encoded.split("[|]");
+//        for(int i = 0; i < array.length && i < Constants.BallTypes(gType); i++){
+//            if(array[i].length() > 0)
+//                resCount[i] = Integer.parseInt(array[i]);
+//        }
     }
 
     public void loadScore(){
 
-        score = ResourceManager.getInstance().prefGetLong("score"+gType.toString());
+        //score = ResourceManager.getInstance().prefGetLong("score"+gType.toString());
+        score = ResourceManager.getInstance().hsRepo.getScoreDay(gType, System.currentTimeMillis());
     }
 
     public boolean saveExists(){

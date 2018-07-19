@@ -16,9 +16,11 @@ public class ExampleUnitTest {
         assertEquals(4, 2 + 2);
     }
 
+    @Test
+    public void string_format() {assertEquals("x100", String.format("x%d",100));}
 
     private GameField initGameField(){
-        GameField gf = new GameField(7, GameType.Medium);
+        GameField gf = new GameField(GameType.Medium);
         int[][] data = new int[][]{
                 {  1,  2,  3,  4,  5,  6,  7 },
                 {  8,  9, 10, 11, 12, 13, 14 },

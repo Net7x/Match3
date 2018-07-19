@@ -7,15 +7,20 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
+
 import static com.shageev.pavel.match3.GameMode.*;
 
 enum GameMode{Selection, Swap, SwapBack, Explode, FallDown, OnHold}
-enum GameType{Easy,Medium,Hard}
+
 
 public class GameView extends SurfaceView {
     GameLoop gameLoop;
@@ -30,34 +35,42 @@ public class GameView extends SurfaceView {
     private GameMode gameMode;
     private GameType gameType;
     Tile swapFrom, swapTo;
-    private Paint resourceCounterPaint, scorePaint;
+    private Paint resourceCounterPaint, scorePaint, resourceMultiplierPaint, resMultiplierShadow;
+    private DecimalFormat df;
 
     public GameView(Context context, GameType type){
         super(context);
         thisView = this;
         gameType = type;
+
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+        symbols.setGroupingSeparator(' ');
+        df = new DecimalFormat("###,###", symbols);
+
         SurfaceHolder holder = getHolder();
 
-        gField = new GameField(Constants.COLUMNS, gameType);
+        gField = new GameField(gameType);
         gField.init();
 
         SelectedTileIndex = -1;
 
-        moveTileCol = Constants.COLUMNS;
-        moveTileRow = Constants.COLUMNS;
+        moveTileCol = gField.cols;
+        moveTileRow = gField.cols;
 
         holder.addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(SurfaceHolder surfaceHolder) {
                 gField.loadTiles();
-                if(gField.availableMoves == 0){
-                    //TODO: no moves action should replace this
-                    gField.init();
-                }
+
                 gameLoop = new GameLoop(thisView);
                 gameLoop.SetRunning(true);
                 gameLoop.start();
                 gameMode = Selection;
+
+                if(gField.availableMoves == 0){
+                    gField.matchAll();
+                    gameMode = Explode;
+                }
             }
 
             @Override
@@ -83,6 +96,18 @@ public class GameView extends SurfaceView {
         resourceCounterPaint.setTextSize(60);
         resourceCounterPaint.setTextAlign(Paint.Align.CENTER);
 
+        resourceMultiplierPaint = new Paint();
+        resourceMultiplierPaint.setColor(Color.WHITE);
+        resourceMultiplierPaint.setTextSize(40);
+        resourceMultiplierPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+        resourceMultiplierPaint.setTextAlign(Paint.Align.LEFT);
+
+        resMultiplierShadow = new Paint();
+        resMultiplierShadow.setColor(Color.DKGRAY);
+        resMultiplierShadow.setTextSize(40);
+        resMultiplierShadow.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+        resMultiplierShadow.setTextAlign(Paint.Align.LEFT);
+
         scorePaint = new Paint();
         scorePaint.setColor(Color.YELLOW);
         scorePaint.setTextSize(200);
@@ -93,6 +118,8 @@ public class GameView extends SurfaceView {
         int x1, y1, x2, y2;
         int x1d, y1d, x2d, y2d;
         int x1n, y1n, x2n, y2n;
+
+        gField.updateFallen(modifier);
 
         switch(gameMode) {
             case Selection:
@@ -186,8 +213,8 @@ public class GameView extends SurfaceView {
                 break;
             case Explode:
                 boolean finishExplosions = true;
-                for(int i = 0; i < Constants.COLUMNS; i++){
-                    for(int j = 0; j < Constants.COLUMNS; j++){
+                for(int i = 0; i < gField.cols; i++){
+                    for(int j = 0; j < gField.cols; j++){
                         if(gField.getRemoveState(i, j)){
                             Tile t = gField.getTile(i, j);
                             t.explodePhase += Constants.EXPLODE_SPEED * modifier;
@@ -213,7 +240,12 @@ public class GameView extends SurfaceView {
                         gameMode = Explode;
                     } else {
                         gField.saveTiles();
-                        gameMode = Selection;
+                        if(gField.availableMoves > 0) {
+                            gameMode = Selection;
+                        } else {
+                            gField.matchAll();
+                            gameMode = Explode;
+                        }
                         gField.scoreSeqModifier = 1;
                     }
                 }
@@ -225,91 +257,117 @@ public class GameView extends SurfaceView {
     protected void onDraw(Canvas canvas){
         if(canvas != null && ResourceManager.getInstance().scaledImagesLoaded){
             canvas.drawColor(Color.BLACK);
-            for(int i = 0; i < gField.Tiles.size(); i++){
-                Bitmap b;
-                Tile t = gField.Tiles.get(i);
-                //if tile higher than board - skip it
-                if(t.Row * tileWidth + t.dY < - tileWidth)
-                    continue;
 
-                double jumpModifier = 0;
+            drawResources(canvas);
+            drawScore(canvas);
+            drawBalls(canvas);
+            drawMovesLeft(canvas);
 
-                if(t.Selected){
-                    jumpModifier = Math.sin(t.jumpPhase) * tileWidth / 6;
-                }
-                b = ResourceManager.getInstance().tileImages.get(t.Type);
-
-                if(t.explodePhase > 0){
-                    transformRect.set(
-                            screenDw + t.Column * tileWidth + t.dX + (int)(tileWidth / 2 * t.explodePhase / Constants.EXPLODE_END),
-                            screenDh + t.Row * tileWidth + (int)(tileWidth / 2 * t.explodePhase / Constants.EXPLODE_END) + t.dY,
-                            screenDw + t.Column * tileWidth + tileWidth + t.dX - (int)(tileWidth / 2 * t.explodePhase / Constants.EXPLODE_END),
-                            screenDh + t.Row * tileWidth + tileWidth - (int)(tileWidth / 2 * t.explodePhase / Constants.EXPLODE_END) + t.dY);
-                    canvas.drawBitmap(b, null, transformRect, null);
-                } else if(jumpModifier <= 0) {
-                    canvas.drawBitmap(b, screenDw + t.Column * tileWidth + t.dX, screenDh + t.Row * tileWidth + t.dY + (int) jumpModifier, null);
-                } else {
-                    transformRect.set(
-                            screenDw + t.Column * tileWidth + t.dX - (int)(jumpModifier / 4),
-                            screenDh + t.Row * tileWidth + (int)(jumpModifier / 2) + t.dY,
-                            screenDw + t.Column * tileWidth + tileWidth + t.dX + (int)(jumpModifier / 4),
-                            screenDh + t.Row * tileWidth + tileWidth + t.dY);
-                    canvas.drawBitmap(b, null, transformRect, null);
-                }
-            }
-            //draw resources
-            int colSize = Math.min(sw, sh) / Constants.BallTypes(gameType);
-            for(int i = 0; i < gField.resCount.length; i++){
-                if(sw > sh){ //landscape
-                    resourceCounterPaint.setTextAlign(Paint.Align.LEFT);
-                    transformRect.set(
-                            (100 - tileWidth / 2) / 2,
-                            i * colSize + colSize / 2 - tileWidth / 4,
-                            100 - (100 - tileWidth / 2) / 2,
-                            i * colSize + colSize / 2 + tileWidth / 4
-                    );
-                    canvas.drawBitmap(ResourceManager.getInstance().tileImages.get(i), null, transformRect, null);
-                    canvas.drawText(String.valueOf(gField.resCount[i]), 110, i * colSize + colSize / 2 + 25, resourceCounterPaint);
-                } else { //portrait
-                    transformRect.set(
-                            i * colSize + colSize / 2 - tileWidth / 4,
-                            (100 - tileWidth / 2) / 2,
-                            i * colSize + colSize / 2 + tileWidth / 4,
-                            100 - (100 - tileWidth / 2) / 2
-                    );
-                    canvas.drawBitmap(ResourceManager.getInstance().tileImages.get(i), null, transformRect, null);
-                    canvas.drawText(String.valueOf(gField.resCount[i]), i * colSize + colSize / 2, 160, resourceCounterPaint);
-
-                    canvas.drawText(String.valueOf(gField.score), sw/2, screenDh/2 + scorePaint.getTextSize() / 2, scorePaint);
-                }
-            }
-            //show number of available moves
-            Paint movesPaint = new Paint();
-            movesPaint.setTextSize(50);
-            movesPaint.setColor(Color.WHITE);
-            canvas.drawText(String.valueOf(gField.availableMoves),20, sh - 100, movesPaint);
-            //show some internal arrays
-//            int size = 20;
-//            Paint textPaint = new Paint();
-//            textPaint.setColor(Color.WHITE);
-//            textPaint.setTextSize(size);
-//            for(int i = 0; i < COLUMNS; i++){
-//                for(int j = 0; j < COLUMNS; j++){
-//                    canvas.drawText(String.valueOf(gField.getTileId(j, i)), i * size * 2, 3* size +j * size * 2, textPaint);
-//
-//                    canvas.drawText(String.valueOf(gField.getTileType(j,i)), size * 2 * (COLUMNS + 2)+ i * size * 2, 3*size + j * size * 2, textPaint);
-//
-//                    for(int k = 0; k < gField.Tiles.size(); k++){
-//                        Tile t = gField.Tiles.get(k);
-//                        if(t.Column == i && t.Row == j){
-//                            canvas.drawText(String.valueOf(k), size * 2 * (2*COLUMNS + 4)+ i * size * 2, 3*size + j * size * 2, textPaint);
-//                            canvas.drawText(String.valueOf(t.Type), size * 2 * (3*COLUMNS + 6)+ i * size * 2, 3*size + j * size * 2, textPaint);
-//
-//                        }
-//                    }
-//                }
-//            }
+            //drawDebugArrays(canvas);
         }
+    }
+
+    private void drawBalls(Canvas canvas){
+        for(int i = 0; i < gField.Tiles.size(); i++){
+            Bitmap b;
+            Tile t = gField.Tiles.get(i);
+            //if tile higher than board - skip it
+            if(t.Row * tileWidth + t.dY < - tileWidth)
+                continue;
+
+            double jumpModifier = 0;
+
+            if(t.Selected){
+                jumpModifier = Math.sin(t.jumpPhase) * tileWidth / 6;
+            }
+            if (t.fallenPhase > 0){
+                jumpModifier = Math.sin(t.fallenPhase) * tileWidth / 6;
+            }
+            b = ResourceManager.getInstance().tileImages.get(t.Type);
+
+            if(t.explodePhase > 0){
+                transformRect.set(
+                        screenDw + t.Column * tileWidth + t.dX + (int)(tileWidth / 2 * t.explodePhase / Constants.EXPLODE_END),
+                        screenDh + t.Row * tileWidth + (int)(tileWidth / 2 * t.explodePhase / Constants.EXPLODE_END) + t.dY,
+                        screenDw + t.Column * tileWidth + tileWidth + t.dX - (int)(tileWidth / 2 * t.explodePhase / Constants.EXPLODE_END),
+                        screenDh + t.Row * tileWidth + tileWidth - (int)(tileWidth / 2 * t.explodePhase / Constants.EXPLODE_END) + t.dY);
+                canvas.drawBitmap(b, null, transformRect, null);
+            } else if(jumpModifier > 0) {
+                transformRect.set(
+                        screenDw + t.Column * tileWidth + t.dX - (int)(jumpModifier / 4),
+                        screenDh + t.Row * tileWidth + (int)(jumpModifier / 2) + t.dY,
+                        screenDw + t.Column * tileWidth + tileWidth + t.dX + (int)(jumpModifier / 4),
+                        screenDh + t.Row * tileWidth + tileWidth + t.dY);
+                canvas.drawBitmap(b, null, transformRect, null);
+            } else {
+                canvas.drawBitmap(b, screenDw + t.Column * tileWidth + t.dX, screenDh + t.Row * tileWidth + t.dY + (int) jumpModifier, null);
+
+            }
+
+        }
+    }
+
+    private void drawMovesLeft(Canvas canvas){
+        Paint movesPaint = new Paint();
+        movesPaint.setTextSize(50);
+        movesPaint.setColor(Color.WHITE);
+        canvas.drawText(String.valueOf(gField.availableMoves),20, sh - 100, movesPaint);
+    }
+
+    private void drawDebugArrays(Canvas canvas){
+            int size = 20;
+            Paint textPaint = new Paint();
+            textPaint.setColor(Color.WHITE);
+            textPaint.setTextSize(size);
+            for(int i = 0; i < gField.cols; i++){
+                for(int j = 0; j < gField.cols; j++){
+                    canvas.drawText(String.valueOf(gField.getTileId(j, i)), i * size * 2, 3* size +j * size * 2, textPaint);
+
+                    canvas.drawText(String.valueOf(gField.getTileType(j,i)), size * 2 * (gField.cols + 2)+ i * size * 2, 3*size + j * size * 2, textPaint);
+
+                    for(int k = 0; k < gField.Tiles.size(); k++){
+                        Tile t = gField.Tiles.get(k);
+                        if(t.Column == i && t.Row == j){
+                            canvas.drawText(String.valueOf(k), size * 2 * (2*gField.cols + 4)+ i * size * 2, 3*size + j * size * 2, textPaint);
+                            canvas.drawText(String.valueOf(t.Type), size * 2 * (3*gField.cols + 6)+ i * size * 2, 3*size + j * size * 2, textPaint);
+
+                        }
+                    }
+                }
+            }
+    }
+
+    private void drawResources(Canvas canvas){
+        int colSize = Math.min(sw, sh) / Constants.BallTypes(gameType);
+        for(int i = 0; i < gField.resCount.length; i++){
+            //resource image
+            transformRect.set(
+                    i * colSize + colSize / 2 - tileWidth / 4,
+                    (100 - tileWidth / 2) / 2,
+                    i * colSize + colSize / 2 + tileWidth / 4,
+                    100 - (100 - tileWidth / 2) / 2
+            );
+            canvas.drawBitmap(ResourceManager.getInstance().tileImages.get(i), null, transformRect, null);
+
+            //resource counter
+            canvas.drawText(Utils.formatCounter(gField.resCount[i]), i * colSize + colSize / 2, 160, resourceCounterPaint);
+
+            //resource multiplier with shadow
+            canvas.drawText(
+                    String.format(Locale.ENGLISH,"x%d", gField.scoreForType(i)),
+                    i*colSize + colSize/2 + tileWidth / 7 - 2,
+                    45 + 2,
+                    resMultiplierShadow);
+            canvas.drawText(
+                    String.format(Locale.ENGLISH,"x%d", gField.scoreForType(i)),
+                    i*colSize + colSize/2 + tileWidth / 7,
+                    45,
+                    resourceMultiplierPaint);
+        }
+    }
+
+    private void drawScore(Canvas canvas){
+        canvas.drawText(df.format(gField.score), sw/2, screenDh/2 + scorePaint.getTextSize() / 2, scorePaint);
     }
 
     private int stepValue(int source, int dest, double modifier){
@@ -406,7 +464,7 @@ public class GameView extends SurfaceView {
     private void setScreenDimensions(int width, int height){
         sw = width;
         sh = height;
-        tileWidth = Math.min(sw, sh) / Constants.COLUMNS;
+        tileWidth = Math.min(sw, sh) / Constants.Columns(gameType);
         ResourceManager.getInstance().scaleImages(tileWidth);
         if (sw > sh){
             screenDh = 0;

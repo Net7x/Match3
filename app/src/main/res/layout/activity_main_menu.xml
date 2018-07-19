@@ -66,10 +66,14 @@
         android:id="@+id/startClassicGame"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp"
+        android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
+        android:background="@drawable/rounded_expert"
         android:onClick="startClassicGame"
         android:text="@string/medium_mode"
+        android:textColor="@color/expertDark"
+        android:textScaleX="1.1"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/expert_view"
         app:layout_constraintEnd_toEndOf="@+id/expert_view" />
 
@@ -77,10 +81,14 @@
         android:id="@+id/startHardGame"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
+        android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
+        android:background="@drawable/rounded_master"
         android:onClick="startHardGame"
         android:text="@string/hard_mode"
+        android:textColor="@color/masterDark"
+        android:textScaleX="1.1"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/master_view"
         app:layout_constraintEnd_toEndOf="@+id/master_view" />
 
@@ -90,8 +98,12 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
+        android:background="@drawable/rounded_easy"
         android:onClick="startEasyGame"
         android:text="@string/easy_mode"
+        android:textColor="@color/easyDark"
+        android:textScaleX="1.1"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/easy_view"
         app:layout_constraintEnd_toEndOf="@+id/easy_view" />
 
@@ -103,6 +115,11 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:padding="3dp"
+        android:shadowColor="@color/shadow"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="7"
         android:text=""
         android:textAlignment="center"
         android:textColor="@color/white"
@@ -121,6 +138,11 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:padding="3dp"
+        android:shadowColor="@color/shadow"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="7"
         android:text=""
         android:textAlignment="center"
         android:textColor="@color/white"
@@ -139,6 +161,11 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:padding="3dp"
+        android:shadowColor="@color/shadow"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="7"
         android:text=""
         android:textAlignment="center"
         android:textColor="@color/white"
@@ -155,6 +182,10 @@
         android:layout_height="32dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:shadowColor="@color/shadow"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="5"
         android:text="@string/master_label"
         android:textColor="@color/white"
         android:textSize="24sp"
@@ -169,6 +200,10 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="@string/expert_label"
+        android:shadowColor="@color/shadow"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="5"
         android:textColor="@color/white"
         android:textSize="24sp"
         android:textStyle="bold"
@@ -182,6 +217,10 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="@string/easy_label"
+        android:shadowColor="@color/shadow"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="5"
         android:textColor="@color/white"
         android:textSize="24sp"
         android:textStyle="bold"
@@ -190,203 +229,268 @@
 
     <ImageView
         android:id="@+id/easy_a1"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
         android:layout_marginEnd="8dp"
         android:layout_marginTop="8dp"
+        android:contentDescription="@string/ball"
         android:scaleType="fitXY"
         android:src="@drawable/a1"
         app:layout_constraintEnd_toEndOf="@+id/easy_view"
-        app:layout_constraintTop_toTopOf="@+id/easy_view"
-        android:contentDescription="@string/ball" />
+        app:layout_constraintTop_toTopOf="@+id/easy_view" />
 
     <ImageView
         android:id="@+id/easy_a2"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginEnd="24dp"
         android:layout_marginTop="8dp"
+        android:contentDescription="@string/ball"
         android:scaleType="fitXY"
         android:src="@drawable/a2"
-        app:layout_constraintEnd_toStartOf="@+id/easy_a1"
-        app:layout_constraintTop_toTopOf="@+id/easy_view"
-        android:contentDescription="@string/ball" />
+        app:layout_constraintEnd_toEndOf="@+id/easy_view"
+        app:layout_constraintTop_toTopOf="@+id/easy_view" />
 
     <ImageView
         android:id="@+id/easy_a3"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginEnd="40dp"
         android:layout_marginTop="8dp"
+        android:contentDescription="@string/ball"
         android:scaleType="fitXY"
-        android:src="@drawable/a3"
-        app:layout_constraintEnd_toStartOf="@+id/easy_a2"
-        app:layout_constraintTop_toTopOf="@+id/easy_view"
-        android:contentDescription="@string/ball" />
+        android:src="@drawable/a5"
+        app:layout_constraintEnd_toEndOf="@+id/easy_view"
+        app:layout_constraintTop_toTopOf="@+id/easy_view" />
 
     <ImageView
         android:id="@+id/easy_a4"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginEnd="56dp"
         android:layout_marginTop="8dp"
+        android:contentDescription="@string/ball"
         android:scaleType="fitXY"
         android:src="@drawable/a4"
-        app:layout_constraintEnd_toStartOf="@+id/easy_a3"
-        app:layout_constraintTop_toTopOf="@+id/easy_view"
-        android:contentDescription="@string/ball" />
+        app:layout_constraintEnd_toEndOf="@+id/easy_view"
+        app:layout_constraintTop_toTopOf="@+id/easy_view" />
 
     <ImageView
         android:id="@+id/easy_a5"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginEnd="72dp"
         android:layout_marginTop="8dp"
+        android:contentDescription="@string/ball"
         android:scaleType="fitXY"
-        android:src="@drawable/a5"
-        app:layout_constraintEnd_toStartOf="@+id/easy_a4"
-        app:layout_constraintTop_toTopOf="@+id/easy_view"
-        android:contentDescription="@string/ball" />
+        android:src="@drawable/a3"
+        app:layout_constraintEnd_toEndOf="@+id/easy_view"
+        app:layout_constraintTop_toTopOf="@+id/easy_view" />
 
     <ImageView
         android:id="@+id/expert_a1"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
         android:layout_marginEnd="8dp"
         android:layout_marginTop="8dp"
+        android:contentDescription="@string/ball"
         android:scaleType="fitXY"
         android:src="@drawable/a1"
         app:layout_constraintEnd_toEndOf="@+id/expert_view"
-        app:layout_constraintTop_toTopOf="@+id/expert_view"
-        android:contentDescription="@string/ball" />
+        app:layout_constraintTop_toTopOf="@+id/expert_view" />
 
     <ImageView
         android:id="@+id/expert_a2"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginEnd="24dp"
         android:layout_marginTop="8dp"
+        android:contentDescription="@string/ball"
         android:scaleType="fitXY"
         android:src="@drawable/a2"
-        app:layout_constraintEnd_toStartOf="@+id/expert_a1"
-        app:layout_constraintTop_toTopOf="@+id/expert_view"
-        android:contentDescription="@string/ball" />
+        app:layout_constraintEnd_toEndOf="@+id/expert_view"
+        app:layout_constraintTop_toTopOf="@+id/expert_view" />
 
     <ImageView
         android:id="@+id/expert_a3"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginEnd="40dp"
         android:layout_marginTop="8dp"
+        android:contentDescription="@string/ball"
         android:scaleType="fitXY"
-        android:src="@drawable/a3"
-        app:layout_constraintEnd_toStartOf="@+id/expert_a2"
-        app:layout_constraintTop_toTopOf="@+id/expert_view"
-        android:contentDescription="@string/ball" />
+        android:src="@drawable/a5"
+        app:layout_constraintEnd_toEndOf="@+id/expert_view"
+        app:layout_constraintTop_toTopOf="@+id/expert_view" />
 
     <ImageView
         android:id="@+id/expert_a4"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginEnd="56dp"
         android:layout_marginTop="8dp"
+        android:contentDescription="@string/ball"
         android:scaleType="fitXY"
         android:src="@drawable/a4"
-        app:layout_constraintEnd_toStartOf="@+id/expert_a3"
-        app:layout_constraintTop_toTopOf="@+id/expert_view"
-        android:contentDescription="@string/ball" />
+        app:layout_constraintEnd_toEndOf="@+id/expert_view"
+        app:layout_constraintTop_toTopOf="@+id/expert_view" />
 
     <ImageView
         android:id="@+id/expert_a5"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginEnd="72dp"
         android:layout_marginTop="8dp"
+        android:contentDescription="@string/ball"
         android:scaleType="fitXY"
-        android:src="@drawable/a5"
-        app:layout_constraintEnd_toStartOf="@+id/expert_a4"
-        app:layout_constraintTop_toTopOf="@+id/expert_view"
-        android:contentDescription="@string/ball" />
+        android:src="@drawable/a3"
+        app:layout_constraintEnd_toEndOf="@+id/expert_view"
+        app:layout_constraintTop_toTopOf="@+id/expert_view" />
 
     <ImageView
         android:id="@+id/expert_a6"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginEnd="88dp"
         android:layout_marginTop="8dp"
+        android:contentDescription="@string/ball"
         android:scaleType="fitXY"
         android:src="@drawable/a6"
-        app:layout_constraintEnd_toStartOf="@+id/expert_a5"
-        app:layout_constraintTop_toTopOf="@+id/expert_view"
-        android:contentDescription="@string/ball" />
+        app:layout_constraintEnd_toEndOf="@+id/expert_view"
+        app:layout_constraintTop_toTopOf="@+id/expert_view" />
 
     <ImageView
         android:id="@+id/master_a1"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
         android:layout_marginEnd="8dp"
         android:layout_marginTop="8dp"
+        android:contentDescription="@string/ball"
         android:scaleType="fitXY"
         android:src="@drawable/a1"
         app:layout_constraintEnd_toEndOf="@+id/master_view"
-        app:layout_constraintTop_toTopOf="@+id/master_view"
-        android:contentDescription="@string/ball" />
+        app:layout_constraintTop_toTopOf="@+id/master_view" />
 
     <ImageView
         android:id="@+id/master_a2"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginEnd="24dp"
         android:layout_marginTop="8dp"
+        android:contentDescription="@string/ball"
         android:scaleType="fitXY"
         android:src="@drawable/a2"
-        app:layout_constraintEnd_toStartOf="@+id/master_a1"
-        app:layout_constraintTop_toTopOf="@+id/master_view"
-        android:contentDescription="@string/ball" />
+        app:layout_constraintEnd_toEndOf="@+id/master_view"
+        app:layout_constraintTop_toTopOf="@+id/master_view" />
 
     <ImageView
         android:id="@+id/master_a3"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginEnd="40dp"
         android:layout_marginTop="8dp"
+        android:contentDescription="@string/ball"
         android:scaleType="fitXY"
-        android:src="@drawable/a3"
-        app:layout_constraintEnd_toStartOf="@+id/master_a2"
-        app:layout_constraintTop_toTopOf="@+id/master_view"
-        android:contentDescription="@string/ball" />
+        android:src="@drawable/a5"
+        app:layout_constraintEnd_toEndOf="@+id/master_view"
+        app:layout_constraintTop_toTopOf="@+id/master_view" />
 
     <ImageView
         android:id="@+id/master_a4"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
+        android:layout_width="34dp"
+        android:layout_height="35dp"
+        android:layout_marginEnd="56dp"
         android:layout_marginTop="8dp"
+        android:contentDescription="@string/ball"
         android:scaleType="fitXY"
         android:src="@drawable/a4"
-        app:layout_constraintEnd_toStartOf="@+id/master_a3"
-        app:layout_constraintTop_toTopOf="@+id/master_view"
-        android:contentDescription="@string/ball" />
+        app:layout_constraintEnd_toEndOf="@+id/master_view"
+        app:layout_constraintTop_toTopOf="@+id/master_view" />
 
     <ImageView
         android:id="@+id/master_a5"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
+        android:layout_width="36dp"
+        android:layout_height="35dp"
+        android:layout_marginEnd="72dp"
         android:layout_marginTop="8dp"
+        android:contentDescription="@string/ball"
         android:scaleType="fitXY"
-        android:src="@drawable/a5"
-        app:layout_constraintEnd_toStartOf="@+id/master_a4"
-        app:layout_constraintTop_toTopOf="@+id/master_view"
-        android:contentDescription="@string/ball" />
+        android:src="@drawable/a3"
+        app:layout_constraintEnd_toEndOf="@+id/master_view"
+        app:layout_constraintTop_toTopOf="@+id/master_view" />
 
     <ImageView
         android:id="@+id/master_a6"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginEnd="88dp"
         android:layout_marginTop="8dp"
+        android:contentDescription="@string/ball"
         android:scaleType="fitXY"
         android:src="@drawable/a6"
-        app:layout_constraintEnd_toStartOf="@+id/master_a5"
-        app:layout_constraintTop_toTopOf="@+id/master_view"
-        android:contentDescription="@string/ball" />
+        app:layout_constraintEnd_toEndOf="@+id/master_view"
+        app:layout_constraintTop_toTopOf="@+id/master_view" />
 
     <ImageView
         android:id="@+id/master_a7"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginEnd="104dp"
         android:layout_marginTop="8dp"
+        android:contentDescription="@string/ball"
         android:scaleType="fitXY"
         android:src="@drawable/a7"
-        app:layout_constraintEnd_toStartOf="@+id/master_a6"
-        app:layout_constraintTop_toTopOf="@+id/master_view"
-        android:contentDescription="@string/ball" />
+        app:layout_constraintEnd_toEndOf="@+id/master_view"
+        app:layout_constraintTop_toTopOf="@+id/master_view" />
+
+    <Button
+        android:id="@+id/buttonInfoEasy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="8dp"
+        android:background="@drawable/rounded_easy"
+        android:onClick="infoEasyGame"
+        android:text="@string/info_label"
+        android:textColor="@color/easyDark"
+        app:layout_constraintBottom_toBottomOf="@+id/easy_view"
+        app:layout_constraintStart_toStartOf="@+id/easy_view" />
+
+    <Button
+        android:id="@+id/buttonInfoExpert"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="8dp"
+        android:background="@drawable/rounded_expert"
+        android:onClick="infoExpertGame"
+        android:text="@string/info_label"
+        android:textColor="@color/expertDark"
+        app:layout_constraintBottom_toBottomOf="@+id/expert_view"
+        app:layout_constraintStart_toStartOf="@+id/expert_view" />
+
+    <Button
+        android:id="@+id/buttonInfoMaster"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="8dp"
+        android:background="@drawable/rounded_master"
+        android:onClick="infoMasterGame"
+        android:text="@string/info_label"
+        android:textColor="@color/masterDark"
+        app:layout_constraintBottom_toBottomOf="@+id/master_view"
+        app:layout_constraintStart_toStartOf="@+id/master_view" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="16dp"
+        android:onClick="settings"
+        android:text="Settings"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

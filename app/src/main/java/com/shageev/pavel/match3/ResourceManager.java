@@ -1,12 +1,16 @@
 package com.shageev.pavel.match3;
 
 import android.app.Activity;
+import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
+
+import com.shageev.pavel.match3.Data.Db;
+import com.shageev.pavel.match3.Data.HighScoresRepository;
 
 import java.util.ArrayList;
 
@@ -18,6 +22,7 @@ public class ResourceManager {
     private int tileSize = 0;
     private Resources res;
     private SharedPreferences prefs;
+    public HighScoresRepository hsRepo;
 
     private static final ResourceManager INSTANCE = new ResourceManager();
 
@@ -35,6 +40,10 @@ public class ResourceManager {
         tileRawImages.add(BitmapFactory.decodeResource(res, R.drawable.a8));
         tileRawImages.add(BitmapFactory.decodeResource(res, R.drawable.a9));
         rawImagesLoaded = true;
+    }
+
+    public void init(Activity activity){
+        hsRepo = new HighScoresRepository(activity.getApplication());
     }
 
     public void initPrefs(Activity activity){

@@ -18,6 +18,7 @@ public class TitleActivity extends Activity {
         super.onStart();
 
         final Activity current = this;
+        ResourceManager.getInstance().init(this);
         ResourceManager.getInstance().loadImages(current.getResources());
 
         Handler handler = new Handler();

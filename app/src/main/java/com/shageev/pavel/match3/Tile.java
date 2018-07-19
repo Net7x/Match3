@@ -7,4 +7,5 @@ public class Tile {
     public boolean Selected = false;
     public double jumpPhase;
     public double explodePhase;
+    public double fallenPhase;
 }
