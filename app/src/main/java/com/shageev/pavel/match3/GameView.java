@@ -347,7 +347,9 @@ public class GameView extends SurfaceView {
                     i * colSize + colSize / 2 + tileWidth / 4,
                     100 - (100 - tileWidth / 2) / 2
             );
-            canvas.drawBitmap(ResourceManager.getInstance().tileImages.get(i), null, transformRect, null);
+
+            if(i < ResourceManager.getInstance().tileImages.size())
+                canvas.drawBitmap(ResourceManager.getInstance().tileImages.get(i), null, transformRect, null);
 
             //resource counter
             canvas.drawText(Utils.formatCounter(gField.resCount[i]), i * colSize + colSize / 2, 160, resourceCounterPaint);

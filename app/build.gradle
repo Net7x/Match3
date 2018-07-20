@@ -39,5 +39,5 @@ dependencies {
     annotationProcessor "android.arch.lifecycle:compiler:$rootProject.archLifecycleVersion"
 
     //Charts
-    implementation 'com.github.PhilJay:MPAndroidChart:v2.0.9'
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
 }

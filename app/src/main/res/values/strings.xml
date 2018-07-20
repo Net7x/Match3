@@ -10,5 +10,8 @@
     <string name="master_label">Master</string>
     <string name="expert_label">Expert</string>
     <string name="easy_label">Easy</string>
-    <string name="stats_title">Statistics</string>
+    <string name="stats_title">%1$s Statistics</string>
+    <string name="this_week">This week</string>
+    <string name="this_month">This month</string>
+    <string name="this_year">This year</string>
 </resources>

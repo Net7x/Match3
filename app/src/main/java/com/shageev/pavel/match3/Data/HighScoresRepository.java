@@ -37,6 +37,15 @@ public class HighScoresRepository {
                 c.get(Calendar.YEAR)).total;
     }
 
+    public long getScoreMonth(GameType type, long timestamp){
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(timestamp);
+        return mDao.score(
+                type.getInt(),
+                c.get(Calendar.MONTH),
+                c.get(Calendar.YEAR)).total;
+    }
+
     public int[] getResourcesDay(GameType type, long timestamp){
         Calendar c = Calendar.getInstance();
         c.setTimeInMillis(timestamp);
