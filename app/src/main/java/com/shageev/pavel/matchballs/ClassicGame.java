@@ -1,4 +1,4 @@
-package com.shageev.pavel.match3;
+package com.shageev.pavel.matchballs;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -12,7 +12,7 @@ public class ClassicGame extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
-        gType = (GameType)intent.getSerializableExtra("com.shageev.pavel.match3.GameType");
+        gType = (GameType)intent.getSerializableExtra("GameType");
         //gv = new GameView(this);
         //setContentView(gv);
         ResourceManager.getInstance().initPrefs(this);

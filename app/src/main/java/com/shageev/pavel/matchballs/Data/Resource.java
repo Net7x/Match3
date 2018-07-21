@@ -1,4 +1,4 @@
-package com.shageev.pavel.match3.Data;
+package com.shageev.pavel.matchballs.Data;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;

@@ -1,4 +1,4 @@
-package com.shageev.pavel.match3.Data;
+package com.shageev.pavel.matchballs.Data;
 
 public class TotalScore {
     public long total;

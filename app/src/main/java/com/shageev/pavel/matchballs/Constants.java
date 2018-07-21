@@ -1,4 +1,4 @@
-package com.shageev.pavel.match3;
+package com.shageev.pavel.matchballs;
 
 public class Constants {
     public static int FALL_SPEED = 2000;

@@ -1,12 +1,8 @@
-package com.shageev.pavel.match3.Data;
+package com.shageev.pavel.matchballs.Data;
 
 import android.arch.persistence.room.Dao;
-import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
-import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
-
-import com.shageev.pavel.match3.GameType;
 
 import java.util.List;
 

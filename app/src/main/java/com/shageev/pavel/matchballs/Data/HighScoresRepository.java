@@ -1,11 +1,10 @@
-package com.shageev.pavel.match3.Data;
+package com.shageev.pavel.matchballs.Data;
 
 import android.app.Application;
 import android.os.AsyncTask;
-import android.util.Log;
 
-import com.shageev.pavel.match3.Constants;
-import com.shageev.pavel.match3.GameType;
+import com.shageev.pavel.matchballs.Constants;
+import com.shageev.pavel.matchballs.GameType;
 
 import java.util.Calendar;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.shageev.pavel.match3;
+package com.shageev.pavel.matchballs;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -19,7 +19,7 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.formatter.IValueFormatter;
 import com.github.mikephil.charting.utils.ViewPortHandler;
-import com.shageev.pavel.match3.Data.HighScoresRepository;
+import com.shageev.pavel.matchballs.Data.HighScoresRepository;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -38,7 +38,7 @@ public class GameStats extends Activity implements AsyncStatsResponse {
 
         setContentView(R.layout.activity_game_stats);
         Intent intent = getIntent();
-        GameType gType = (GameType) intent.getSerializableExtra("com.shageev.pavel.match3.GameType");
+        GameType gType = (GameType) intent.getSerializableExtra("GameType");
 
         TextView statsTitle = findViewById(R.id.statsTitle);
         TextView labelWeek = findViewById(R.id.labelWeek);

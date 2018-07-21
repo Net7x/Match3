@@ -1,4 +1,4 @@
-package com.shageev.pavel.match3;
+package com.shageev.pavel.matchballs;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -26,8 +26,15 @@ public class TitleActivity extends Activity {
             @Override
             public void run() {
                 Intent intent = new Intent(current, MainMenuActivity.class);
-                startActivity(intent);
+                //intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivityForResult(intent, 0);
             }
         }, 1000);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        finish();
     }
 }

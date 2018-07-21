@@ -1,11 +1,11 @@
-package com.shageev.pavel.match3.Data;
+package com.shageev.pavel.matchballs.Data;
 
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
 
-@Database(entities = {HighScore.class, Resource.class}, version = 2, exportSchema = false)
+@Database(entities = {HighScore.class, Resource.class}, version = 1, exportSchema = false)
 public abstract class Db extends RoomDatabase {
     public abstract hsDao hsDao();
 

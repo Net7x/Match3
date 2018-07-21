@@ -1,4 +1,4 @@
-package com.shageev.pavel.match3;
+package com.shageev.pavel.matchballs;
 
 import android.graphics.Canvas;
 
@@ -9,7 +9,7 @@ public class GameLoop extends Thread {
     private boolean running = false;
     private boolean isPaused;
 
-    public GameLoop(GameView view){
+    GameLoop(GameView view){
         this.view = view;
     }
 

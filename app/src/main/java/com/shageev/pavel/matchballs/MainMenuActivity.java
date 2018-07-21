@@ -1,4 +1,4 @@
-package com.shageev.pavel.match3;
+package com.shageev.pavel.matchballs;
 
 import android.app.Activity;
 import android.content.Context;
@@ -7,8 +7,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
-
-import com.shageev.pavel.match3.Data.Resource;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -47,37 +45,37 @@ public class MainMenuActivity extends Activity {
 
     public void startClassicGame(View view){
         Intent intent = new Intent(this, ClassicGame.class);
-        intent.putExtra("com.shageev.pavel.match3.GameType", GameType.Medium);
+        intent.putExtra("GameType", GameType.Medium);
         startActivityForResult(intent, 0);
     }
 
     public void startEasyGame(View view){
         Intent intent = new Intent(this, ClassicGame.class);
-        intent.putExtra("com.shageev.pavel.match3.GameType", GameType.Easy);
+        intent.putExtra("GameType", GameType.Easy);
         startActivityForResult(intent, 0);
     }
 
     public void startHardGame(View view){
         Intent intent = new Intent(this, ClassicGame.class);
-        intent.putExtra("com.shageev.pavel.match3.GameType", GameType.Hard);
+        intent.putExtra("GameType", GameType.Hard);
         startActivityForResult(intent, 0);
     }
 
     public void infoEasyGame(View view){
         Intent intent = new Intent(this, GameStats.class);
-        intent.putExtra("com.shageev.pavel.match3.GameType", GameType.Easy);
+        intent.putExtra("GameType", GameType.Easy);
         startActivityForResult(intent, 0);
     }
 
     public void infoExpertGame(View view){
         Intent intent = new Intent(this, GameStats.class);
-        intent.putExtra("com.shageev.pavel.match3.GameType", GameType.Medium);
+        intent.putExtra("GameType", GameType.Medium);
         startActivityForResult(intent, 0);
     }
 
     public void infoMasterGame(View view){
         Intent intent = new Intent(this, GameStats.class);
-        intent.putExtra("com.shageev.pavel.match3.GameType", GameType.Hard);
+        intent.putExtra("GameType", GameType.Hard);
         startActivityForResult(intent, 0);
     }
 

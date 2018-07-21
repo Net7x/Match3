@@ -1,9 +1,6 @@
-package com.shageev.pavel.match3;
+package com.shageev.pavel.matchballs;
 
-import android.provider.SyncStateContract;
 import android.util.Log;
-
-import com.shageev.pavel.match3.Data.Resource;
 
 import java.util.ArrayList;
 
@@ -19,7 +16,7 @@ public class GameField {
     public long score;
     public int scoreSeqModifier = 1;
 
-    public GameField(GameType gType){
+    GameField(GameType gType){
         cols = Constants.Columns(gType);
         this.gType = gType;
         resCount = new int[Constants.BallTypes(gType)];
@@ -429,11 +426,11 @@ public class GameField {
             encoded.append(getTileType(r, c));
         }
         ResourceManager.getInstance().prefSaveString("tiles" + gType.toString(), encoded.toString());
-        saveResources();
-        saveScore();
+        //saveResources();
+        //saveScore();
     }
 
-    public void saveResources(){
+//    public void saveResources(){
 //        StringBuilder sb = new StringBuilder();
 //        for(int i = 0; i < resCount.length; i++){
 //            sb.append(resCount[i]);
@@ -443,11 +440,11 @@ public class GameField {
 //        ResourceManager.getInstance().prefSaveString("res"+gType.toString(), sb.toString());
 
         //ResourceManager.getInstance().hsRepo.insert(gType, System.currentTimeMillis(), resCount);
-    }
+//    }
 
-    public void saveScore(){
+//    public void saveScore(){
         //ResourceManager.getInstance().prefSaveLong("score"+gType.toString(), score);
-    }
+//    }
 
     public void loadTiles(){
         String encoded;
@@ -467,17 +464,11 @@ public class GameField {
         loadScore();
     }
 
-    public void loadResources(){
+    private void loadResources(){
         resCount = ResourceManager.getInstance().hsRepo.getResourcesDay(gType, System.currentTimeMillis());
-//        String encoded = ResourceManager.getInstance().prefGetString("res"+gType.toString());
-//        String[] array = encoded.split("[|]");
-//        for(int i = 0; i < array.length && i < Constants.BallTypes(gType); i++){
-//            if(array[i].length() > 0)
-//                resCount[i] = Integer.parseInt(array[i]);
-//        }
     }
 
-    public void loadScore(){
+    private void loadScore(){
 
         //score = ResourceManager.getInstance().prefGetLong("score"+gType.toString());
         score = ResourceManager.getInstance().hsRepo.getScoreDay(gType, System.currentTimeMillis());

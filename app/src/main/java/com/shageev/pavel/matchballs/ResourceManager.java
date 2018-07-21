@@ -1,7 +1,6 @@
-package com.shageev.pavel.match3;
+package com.shageev.pavel.matchballs;
 
 import android.app.Activity;
-import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -9,8 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 
-import com.shageev.pavel.match3.Data.Db;
-import com.shageev.pavel.match3.Data.HighScoresRepository;
+import com.shageev.pavel.matchballs.Data.HighScoresRepository;
 
 import java.util.ArrayList;
 

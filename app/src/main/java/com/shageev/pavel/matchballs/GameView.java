@@ -1,4 +1,4 @@
-package com.shageev.pavel.match3;
+package com.shageev.pavel.matchballs;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -17,7 +17,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
-import static com.shageev.pavel.match3.GameMode.*;
+import static com.shageev.pavel.matchballs.GameMode.*;
 
 enum GameMode{Selection, Swap, SwapBack, Explode, FallDown, OnHold}
 

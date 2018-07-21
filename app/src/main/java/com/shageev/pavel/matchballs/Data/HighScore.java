@@ -1,13 +1,7 @@
-package com.shageev.pavel.match3.Data;
+package com.shageev.pavel.matchballs.Data;
 
-import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
-
-import com.shageev.pavel.match3.GameType;
-
-import java.util.Date;
 
 @Entity (tableName = "high_scores")
 public class HighScore {
