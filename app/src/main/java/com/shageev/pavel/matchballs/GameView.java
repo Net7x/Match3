@@ -24,7 +24,7 @@ enum GameMode{Selection, Swap, SwapBack, Explode, FallDown, OnHold}
 
 public class GameView extends SurfaceView {
     GameLoop gameLoop;
-    int sw,sh, screenDw, screenDh;
+    int sw, sh, screenDw, screenDh;
     int tileWidth;
     private GameView thisView;
     GameField gField;
@@ -34,11 +34,13 @@ public class GameView extends SurfaceView {
     Rect transformRect = new Rect();
     private GameMode gameMode;
     private GameType gameType;
+    private int scoreWidth, scoreHeight, topupHeight;
     Tile swapFrom, swapTo;
     private Paint resourceCounterPaint, scorePaint, resourceMultiplierPaint, resMultiplierShadow;
+    private Paint topupPaint;
     private DecimalFormat df;
 
-    public GameView(Context context, GameType type){
+    public GameView(Context context, GameType type) {
         super(context);
         thisView = this;
         gameType = type;
@@ -67,7 +69,7 @@ public class GameView extends SurfaceView {
                 gameLoop.start();
                 gameMode = Selection;
 
-                if(gField.availableMoves == 0){
+                if (gField.availableMoves == 0) {
                     gField.matchAll();
                     gameMode = Explode;
                 }
@@ -93,35 +95,59 @@ public class GameView extends SurfaceView {
 
         resourceCounterPaint = new Paint();
         resourceCounterPaint.setColor(Color.WHITE);
-        resourceCounterPaint.setTextSize(60);
+        resourceCounterPaint.setTextSize(Utils.DpToPx(this.getContext(), 16));
         resourceCounterPaint.setTextAlign(Paint.Align.CENTER);
+
+        int resMultiplierTextSize = Utils.DpToPx(this.getContext(), 10);
 
         resourceMultiplierPaint = new Paint();
         resourceMultiplierPaint.setColor(Color.WHITE);
-        resourceMultiplierPaint.setTextSize(40);
+        resourceMultiplierPaint.setTextSize(resMultiplierTextSize);
         resourceMultiplierPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
         resourceMultiplierPaint.setTextAlign(Paint.Align.LEFT);
 
         resMultiplierShadow = new Paint();
         resMultiplierShadow.setColor(Color.DKGRAY);
-        resMultiplierShadow.setTextSize(40);
+        resMultiplierShadow.setTextSize(resMultiplierTextSize);
         resMultiplierShadow.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
         resMultiplierShadow.setTextAlign(Paint.Align.LEFT);
 
         scorePaint = new Paint();
         scorePaint.setColor(Color.YELLOW);
-        scorePaint.setTextSize(200);
+        scorePaint.setTextSize(Utils.DpToPx(this.getContext(), 48));
         scorePaint.setTextAlign(Paint.Align.CENTER);
+
+        topupPaint = new Paint();
+        topupPaint.setColor(Color.YELLOW);
+        topupPaint.setTextSize(Utils.DpToPx(this.getContext(), 16));
+        topupPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+        topupPaint.setTextAlign(Paint.Align.CENTER);
+
+        scoreWidth = 100;
+        scoreHeight = Utils.DpToPx(this.getContext(), 48);
+        topupHeight = Utils.DpToPx(this.getContext(), 16);
     }
 
-    protected void update(double modifier){
+    protected void update(double modifier) {
         int x1, y1, x2, y2;
         int x1d, y1d, x2d, y2d;
         int x1n, y1n, x2n, y2n;
 
         gField.updateFallen(modifier);
 
-        switch(gameMode) {
+        //gField.scoreTopups = 0;
+        for (int i = 0; i < gField.TopUps.size(); i++) {
+            Topup t = gField.TopUps.get(i);
+            t.update(modifier, tileWidth, screenDh, sw, scoreWidth, scoreHeight, topupHeight);
+            if (t.x == t.targetX && t.y == t.targetY) {
+                gField.TopUps.remove(t);
+            } else {
+                gField.TopUps.set(i, t);
+                //gField.scoreTopups += t.score;
+            }
+        }
+
+        switch (gameMode) {
             case Selection:
                 for (int i = 0; i < gField.Tiles.size(); i++) {
                     Tile t = gField.Tiles.get(i);
@@ -157,13 +183,13 @@ public class GameView extends SurfaceView {
                 gField.Tiles.set(gField.Tiles.indexOf(swapFrom), swapFrom);
                 gField.Tiles.set(gField.Tiles.indexOf(swapTo), swapTo);
 
-                if(x1d == x1n && y1d == y1n && x2d == x2n && y2d == y2n){
+                if (x1d == x1n && y1d == y1n && x2d == x2n && y2d == y2n) {
                     int fromDx = swapFrom.dX;
                     int fromDy = swapFrom.dY;
                     int toDx = swapTo.dX;
                     int toDy = swapTo.dY;
                     gField.swap(swapFrom, swapTo);
-                    if(gField.match()){
+                    if (gField.match()) {
                         //убрать лишние
                         gameMode = Explode;
                         SelectedTileIndex = -1;
@@ -205,7 +231,7 @@ public class GameView extends SurfaceView {
                 gField.Tiles.set(gField.Tiles.indexOf(swapFrom), swapFrom);
                 gField.Tiles.set(gField.Tiles.indexOf(swapTo), swapTo);
 
-                if(x1d == x1n && y1d == y1n && x2d == x2n && y2d == y2n){
+                if (x1d == x1n && y1d == y1n && x2d == x2n && y2d == y2n) {
                     gField.clearSelected();
 
                     gameMode = Selection;
@@ -213,12 +239,12 @@ public class GameView extends SurfaceView {
                 break;
             case Explode:
                 boolean finishExplosions = true;
-                for(int i = 0; i < gField.cols; i++){
-                    for(int j = 0; j < gField.cols; j++){
-                        if(gField.getRemoveState(i, j)){
+                for (int i = 0; i < gField.cols; i++) {
+                    for (int j = 0; j < gField.cols; j++) {
+                        if (gField.getRemoveState(i, j)) {
                             Tile t = gField.getTile(i, j);
                             t.explodePhase += Constants.EXPLODE_SPEED * modifier;
-                            if(t.explodePhase >= Constants.EXPLODE_END){
+                            if (t.explodePhase >= Constants.EXPLODE_END) {
                                 t.explodePhase = Constants.EXPLODE_END;
                             } else {
                                 finishExplosions = false;
@@ -228,19 +254,19 @@ public class GameView extends SurfaceView {
                         }
                     }
                 }
-                if(finishExplosions){
+                if (finishExplosions) {
                     gField.moveDown(tileWidth);
                     gameMode = FallDown;
                 }
                 break;
             case FallDown:
-                if(!gField.fall(modifier)) {
-                    if(gField.match()){
+                if (!gField.fall(modifier)) {
+                    if (gField.match()) {
                         gField.scoreSeqModifier++;
                         gameMode = Explode;
                     } else {
                         gField.saveTiles();
-                        if(gField.availableMoves > 0) {
+                        if (gField.availableMoves > 0) {
                             gameMode = Selection;
                         } else {
                             gField.matchAll();
@@ -251,20 +277,32 @@ public class GameView extends SurfaceView {
                 }
                 break;
         }
+        gField.scoreTopups = 0;
+        for(int i = 0; i < gField.TopUps.size(); i++){
+            gField.scoreTopups += gField.TopUps.get(i).score;
+        }
     }
 
     @Override
-    protected void onDraw(Canvas canvas){
-        if(canvas != null && ResourceManager.getInstance().scaledImagesLoaded){
+    protected void onDraw(Canvas canvas) {
+        if (canvas != null && ResourceManager.getInstance().scaledImagesLoaded) {
             canvas.drawColor(Color.BLACK);
 
             drawResources(canvas);
             drawScore(canvas);
             drawBalls(canvas);
+
+            drawTopUps(canvas);
+//            drawBalls(canvas);
             drawMovesLeft(canvas);
 
             //drawDebugArrays(canvas);
         }
+    }
+
+    private void drawTopUps(Canvas canvas) {
+        for (int i = 0; i < gField.TopUps.size(); i++)
+            gField.TopUps.get(i).draw(canvas, topupPaint);
     }
 
     private void drawBalls(Canvas canvas){
@@ -283,6 +321,8 @@ public class GameView extends SurfaceView {
             if (t.fallenPhase > 0){
                 jumpModifier = Math.sin(t.fallenPhase) * tileWidth / 6;
             }
+            if(t.Type >= ResourceManager.getInstance().tileImages.size())
+                continue;
             b = ResourceManager.getInstance().tileImages.get(t.Type);
 
             if(t.explodePhase > 0){
@@ -369,7 +409,9 @@ public class GameView extends SurfaceView {
     }
 
     private void drawScore(Canvas canvas){
-        canvas.drawText(df.format(gField.score), sw/2, screenDh/2 + scorePaint.getTextSize() / 2, scorePaint);
+        String scoreText = df.format(gField.score - gField.scoreTopups);
+        canvas.drawText(scoreText, sw/2, screenDh/2 + scorePaint.getTextSize() / 2, scorePaint);
+        scoreWidth = (int)scorePaint.measureText(scoreText);
     }
 
     private int stepValue(int source, int dest, double modifier){

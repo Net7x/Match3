@@ -7,6 +7,20 @@
     android:background="@drawable/menu_bg"
     tools:context=".GameStats">
 
+    <Button
+        android:id="@+id/buttonBackFromStats"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:onClick="back"
+        android:text="@string/menu"
+        android:textColor="@color/easy"
+        android:textSize="20sp"
+        android:paddingTop="6dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/statsTitle"
         android:layout_width="wrap_content"
@@ -19,6 +33,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/labelWeek"
+        android:layout_width="wrap_content"
+        android:layout_height="19dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
+        android:text="@string/this_week"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/statsTitle" />
 
     <com.github.mikephil.charting.charts.BarChart
         android:id="@+id/weekChart"
@@ -33,14 +57,14 @@
         app:layout_constraintTop_toBottomOf="@+id/labelWeek" />
 
     <TextView
-        android:id="@+id/labelWeek"
+        android:id="@+id/labelMonth"
         android:layout_width="wrap_content"
         android:layout_height="19dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:text="@string/this_week"
+        android:text="@string/this_month"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/statsTitle" />
+        app:layout_constraintTop_toBottomOf="@+id/weekChart" />
 
     <com.github.mikephil.charting.charts.BarChart
         android:id="@+id/monthChart"
@@ -55,15 +79,14 @@
         app:layout_constraintTop_toBottomOf="@+id/labelMonth" />
 
     <TextView
-        android:id="@+id/labelMonth"
+        android:id="@+id/labelYear"
         android:layout_width="wrap_content"
         android:layout_height="19dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:text="@string/this_month"
+        android:text="@string/this_year"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/weekChart" />
-
+        app:layout_constraintTop_toBottomOf="@+id/monthChart" />
 
     <com.github.mikephil.charting.charts.BarChart
         android:id="@+id/yearChart"
@@ -76,15 +99,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/labelYear" />
-
-    <TextView
-        android:id="@+id/labelYear"
-        android:layout_width="wrap_content"
-        android:layout_height="19dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:text="@string/this_year"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/monthChart" />
 
 </android.support.constraint.ConstraintLayout>

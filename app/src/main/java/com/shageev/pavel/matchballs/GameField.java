@@ -14,7 +14,9 @@ public class GameField {
     public int availableMoves;
     public int[] resCount;
     public long score;
+    public int scoreTopups;
     public int scoreSeqModifier = 1;
+    public ArrayList<Topup> TopUps;
 
     GameField(GameType gType){
         cols = Constants.Columns(gType);
@@ -26,6 +28,7 @@ public class GameField {
 
     public void init(){
         Tiles = new ArrayList<>();
+        TopUps = new ArrayList<>();
         for(int i = 0; i < cols; i++){
             for(int j = 0; j < cols; j++){
                 Tile t = new Tile();
@@ -44,6 +47,7 @@ public class GameField {
 
     public void init(int[][] tiles){
         Tiles = new ArrayList<>();
+        TopUps = new ArrayList<>();
         for(int i = 0; i < cols; i++){
             for(int j = 0; j < cols; j++){
                 Tile t = new Tile();
@@ -150,6 +154,19 @@ public class GameField {
     }
 
     public void moveDown(int rowSize){
+        long scoreDelta = 0;
+        for(int r = 0; r < cols; r++){
+            for(int c = 0; c < cols; c++){
+                if(getRemoveState(r,c)){
+                    Tile t = getTile(r,c);
+                    int s = scoreForType(t.Type) * scoreSeqModifier;
+                    Topup topup = new Topup(r, c, t.Type, s);
+                    TopUps.add(topup);
+                    scoreDelta += s;
+                }
+            }
+        }
+
         boolean changed;
         int firstRow = 0;
         do {
@@ -172,7 +189,6 @@ public class GameField {
 
         //add new balls
         int[] resDelta = new int[resCount.length];
-        long scoreDelta = 0;
 
         for(int r = 0; r < cols; r++) {
             for(int c = 0; c < cols; c++){
@@ -180,8 +196,7 @@ public class GameField {
                     Tile t = getTile(r,c);
                     resCount[t.Type]++;
                     resDelta[t.Type]++;
-                    //TODO: change score increment rules
-                    scoreDelta += scoreForType(t.Type) * scoreSeqModifier;
+
                     t.Type = (int)(Math.random() * Constants.BallTypes(gType));
                     t.dX = 0;
                     t.dY = - (firstRow + 1) * rowSize;
@@ -193,6 +208,7 @@ public class GameField {
             }
         }
         score += scoreDelta;
+        //scoreTopups += scoreDelta;
         ResourceManager.getInstance().hsRepo.insert(gType, System.currentTimeMillis(), resDelta);
         ResourceManager.getInstance().hsRepo.insert(gType, System.currentTimeMillis(), scoreDelta);
         availableMoves = movesCount();

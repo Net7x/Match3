@@ -4,6 +4,7 @@ public class Constants {
     public static int FALL_SPEED = 2000;
     public static int MOVE_THRESHOLD = 20;
     public static int SWAP_STEP = 700;
+    public static int TOPUP_STEP = 1000;
     public static int JUMP_SPEED = 15;
     public static int EXPLODE_SPEED = 400;
     public static int EXPLODE_END = 100;

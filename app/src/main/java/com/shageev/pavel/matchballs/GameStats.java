@@ -6,6 +6,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.BarChart;
@@ -44,34 +46,43 @@ public class GameStats extends Activity implements AsyncStatsResponse {
         TextView labelWeek = findViewById(R.id.labelWeek);
         TextView labelMonth = findViewById(R.id.labelMonth);
         TextView labelYear = findViewById(R.id.labelYear);
+        Button backBtn = findViewById(R.id.buttonBackFromStats);
         StatisticParams chartParams = new StatisticParams();
+        int primaryColor;
 
         switch(gType){
             case Easy:
                 statsTitle.setText(String.format(getString(R.string.stats_title), getString(R.string.easy_label)));
-                statsTitle.setTextColor(getResources().getColor(R.color.easy));
-                labelWeek.setTextColor(getResources().getColor(R.color.easy));
-                labelMonth.setTextColor(getResources().getColor(R.color.easy));
-                labelYear.setTextColor(getResources().getColor(R.color.easy));
+                primaryColor = getResources().getColor(R.color.easy);
                 chartParams.color = ContextCompat.getColor(this, R.color.easy);
+                backBtn.setBackground(getResources().getDrawable(R.drawable.rounded_back_easy));
                 break;
             case Medium:
                 statsTitle.setText(String.format(getString(R.string.stats_title), getString(R.string.expert_label)));
-                statsTitle.setTextColor(getResources().getColor(R.color.expert));
-                labelWeek.setTextColor(getResources().getColor(R.color.expert));
-                labelMonth.setTextColor(getResources().getColor(R.color.expert));
-                labelYear.setTextColor(getResources().getColor(R.color.expert));
+                primaryColor = getResources().getColor(R.color.expert);
                 chartParams.color = ContextCompat.getColor(this, R.color.expert);
+                backBtn.setBackground(getResources().getDrawable(R.drawable.rounded_back_expert));
                 break;
             case Hard:
                 statsTitle.setText(String.format(getString(R.string.stats_title), getString(R.string.master_label)));
-                statsTitle.setTextColor(getResources().getColor(R.color.master));
-                labelWeek.setTextColor(getResources().getColor(R.color.master));
-                labelMonth.setTextColor(getResources().getColor(R.color.master));
-                labelYear.setTextColor(getResources().getColor(R.color.master));
+                primaryColor = getResources().getColor(R.color.master);
                 chartParams.color = ContextCompat.getColor(this, R.color.master);
+                backBtn.setBackground(getResources().getDrawable(R.drawable.rounded_back_master));
                 break;
+
+            default:
+                primaryColor = getResources().getColor(R.color.white);
+                break;
+
         }
+
+        statsTitle.setTextColor(primaryColor);
+        labelWeek.setTextColor(primaryColor);
+        labelMonth.setTextColor(primaryColor);
+        labelYear.setTextColor(primaryColor);
+        backBtn.setTextColor(primaryColor);
+        backBtn.setTextScaleX(0.8f);
+        backBtn.setHeight(Utils.DpToPx(this,40));
 
         chartParams.repo = ResourceManager.getInstance().hsRepo;
         chartParams.gameType = gType;
@@ -85,6 +96,10 @@ public class GameStats extends Activity implements AsyncStatsResponse {
 
         yearAsync.delegate = this;
         yearAsync.execute(chartParams);
+    }
+
+    public void back(View view){
+        finish();
     }
 
     @Override

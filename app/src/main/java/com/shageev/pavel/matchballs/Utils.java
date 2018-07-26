@@ -1,8 +1,17 @@
 package com.shageev.pavel.matchballs;
 
+import android.content.Context;
+import android.util.DisplayMetrics;
+
 import java.util.Locale;
 
 public class Utils {
+
+    public static int DpToPx(Context ctx, int dp){
+        DisplayMetrics displayMetrics = ctx.getResources().getDisplayMetrics();
+        return Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
+    }
+
     public static String formatCounter(long counter){
         // if counter < 10 000 - show as is
         // 10000 > 10.0K
