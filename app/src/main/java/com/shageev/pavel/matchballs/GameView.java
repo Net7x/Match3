@@ -294,7 +294,7 @@ public class GameView extends SurfaceView {
 
             drawTopUps(canvas);
 //            drawBalls(canvas);
-            drawMovesLeft(canvas);
+            //drawMovesLeft(canvas);
 
             //drawDebugArrays(canvas);
         }

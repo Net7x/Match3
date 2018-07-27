@@ -21,6 +21,8 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.formatter.IValueFormatter;
 import com.github.mikephil.charting.utils.ViewPortHandler;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.shageev.pavel.matchballs.Data.HighScoresRepository;
 
 import java.text.SimpleDateFormat;
@@ -96,6 +98,11 @@ public class GameStats extends Activity implements AsyncStatsResponse {
 
         yearAsync.delegate = this;
         yearAsync.execute(chartParams);
+
+        AdView mAdView;
+        mAdView = findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
     }
 
     public void back(View view){
@@ -137,7 +144,7 @@ public class GameStats extends Activity implements AsyncStatsResponse {
         });
         chart.getLegend().setEnabled(false);
         chart.setData(data);
-        chart.animateXY(1000,1000);
+        chart.animateXY(1000,2000);
         chart.invalidate();
     }
 
