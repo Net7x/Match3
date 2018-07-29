@@ -34,7 +34,7 @@ public class GameView extends SurfaceView {
     Rect transformRect = new Rect();
     private GameMode gameMode;
     private GameType gameType;
-    private int scoreWidth, scoreHeight, topupHeight;
+    private int scoreWidth, scoreHeight, topupHeight, resourceCounterHeight;
     Tile swapFrom, swapTo;
     private Paint resourceCounterPaint, scorePaint, resourceMultiplierPaint, resMultiplierShadow;
     private Paint topupPaint;
@@ -93,9 +93,10 @@ public class GameView extends SurfaceView {
         dm = Resources.getSystem().getDisplayMetrics();
         setScreenDimensions(dm.widthPixels, dm.heightPixels);
 
+        resourceCounterHeight = Utils.DpToPx(this.getContext(), 16);
         resourceCounterPaint = new Paint();
         resourceCounterPaint.setColor(Color.WHITE);
-        resourceCounterPaint.setTextSize(Utils.DpToPx(this.getContext(), 16));
+        resourceCounterPaint.setTextSize(resourceCounterHeight);
         resourceCounterPaint.setTextAlign(Paint.Align.CENTER);
 
         int resMultiplierTextSize = Utils.DpToPx(this.getContext(), 10);
@@ -383,34 +384,38 @@ public class GameView extends SurfaceView {
             //resource image
             transformRect.set(
                     i * colSize + colSize / 2 - tileWidth / 4,
-                    (100 - tileWidth / 2) / 2,
+                    tileWidth  / 8,
                     i * colSize + colSize / 2 + tileWidth / 4,
-                    100 - (100 - tileWidth / 2) / 2
+                    tileWidth / 8 * 5
             );
 
             if(i < ResourceManager.getInstance().tileImages.size())
                 canvas.drawBitmap(ResourceManager.getInstance().tileImages.get(i), null, transformRect, null);
 
             //resource counter
-            canvas.drawText(Utils.formatCounter(gField.resCount[i]), i * colSize + colSize / 2, 160, resourceCounterPaint);
+            canvas.drawText(
+                    Utils.formatCounter(gField.resCount[i]),
+                    i * colSize + colSize / 2,
+                    tileWidth * 6 / 8 + resourceCounterHeight,
+                    resourceCounterPaint);
 
             //resource multiplier with shadow
             canvas.drawText(
                     String.format(Locale.ENGLISH,"x%d", gField.scoreForType(i)),
                     i*colSize + colSize/2 + tileWidth / 7 - 2,
-                    45 + 2,
+                    tileWidth * 3 / 8 - tileWidth / 20 + 2,
                     resMultiplierShadow);
             canvas.drawText(
                     String.format(Locale.ENGLISH,"x%d", gField.scoreForType(i)),
                     i*colSize + colSize/2 + tileWidth / 7,
-                    45,
+                    tileWidth * 3 / 8 - tileWidth / 20,
                     resourceMultiplierPaint);
         }
     }
 
     private void drawScore(Canvas canvas){
         String scoreText = df.format(gField.score - gField.scoreTopups);
-        canvas.drawText(scoreText, sw/2, screenDh/2 + scorePaint.getTextSize() / 2, scorePaint);
+        canvas.drawText(scoreText, sw/2, screenDh/2 + scorePaint.getTextSize() / 2 + tileWidth / 2, scorePaint);
         scoreWidth = (int)scorePaint.measureText(scoreText);
     }
 
@@ -429,6 +434,8 @@ public class GameView extends SurfaceView {
     }
 
     private void swapMode(Tile from, Tile to){
+        if(from == null || to == null)
+            return;
         gameMode = Swap;
         swapFrom = from;
         swapTo = to;

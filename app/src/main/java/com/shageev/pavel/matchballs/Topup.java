@@ -29,7 +29,7 @@ public class Topup {
             x = col * tileSize + tileSize / 2;
             y = screenDy + row * tileSize + tileSize / 2;
             targetX = screenW / 2 + ((int)(Math.random() * scoreWidth) - scoreWidth / 2);
-            targetY = screenDy / 2 + scoreHeight / 2 + topupHeight;
+            targetY = screenDy / 2 + scoreHeight / 2 + topupHeight + tileSize / 2;
         }
         double xMultiplier = 1;
         if(y != targetY) {
