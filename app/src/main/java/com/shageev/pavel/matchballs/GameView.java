@@ -31,13 +31,14 @@ public class GameView extends SurfaceView {
     int moveTileCol, moveTileRow;
     int prevX, prevY;
     int SelectedTileIndex;
+    Rect fieldRect = new Rect();
     Rect transformRect = new Rect();
     private GameMode gameMode;
     private GameType gameType;
     private int scoreWidth, scoreHeight, topupHeight, resourceCounterHeight;
     Tile swapFrom, swapTo;
     private Paint resourceCounterPaint, scorePaint, resourceMultiplierPaint, resMultiplierShadow;
-    private Paint topupPaint;
+    private Paint topupPaint, fieldPaint;
     private DecimalFormat df;
 
     public GameView(Context context, GameType type) {
@@ -127,6 +128,9 @@ public class GameView extends SurfaceView {
         scoreWidth = 100;
         scoreHeight = Utils.DpToPx(this.getContext(), 48);
         topupHeight = Utils.DpToPx(this.getContext(), 16);
+
+        fieldPaint = new Paint();
+        fieldPaint.setColor(getResources().getColor(R.color.fieldSquare));
     }
 
     protected void update(double modifier) {
@@ -291,6 +295,7 @@ public class GameView extends SurfaceView {
 
             drawResources(canvas);
             drawScore(canvas);
+            drawFieldSquares(canvas);
             drawBalls(canvas);
 
             drawTopUps(canvas);
@@ -298,6 +303,22 @@ public class GameView extends SurfaceView {
             //drawMovesLeft(canvas);
 
             //drawDebugArrays(canvas);
+        }
+    }
+
+    private void drawFieldSquares(Canvas canvas){
+        for (int col = 0; col < gField.cols; col++){
+            for (int row = 0; row < gField.cols; row++){
+                if((col + row) % 2 == 0 ){
+                    fieldRect.set(
+                            screenDw + col * tileWidth,
+                            screenDh + row * tileWidth,
+                            screenDw + col * tileWidth + tileWidth,
+                            screenDh + row * tileWidth + tileWidth
+                    );
+                    canvas.drawRect(fieldRect, fieldPaint);
+                }
+            }
         }
     }
 
@@ -341,7 +362,9 @@ public class GameView extends SurfaceView {
                         screenDh + t.Row * tileWidth + tileWidth + t.dY);
                 canvas.drawBitmap(b, null, transformRect, null);
             } else {
-                canvas.drawBitmap(b, screenDw + t.Column * tileWidth + t.dX, screenDh + t.Row * tileWidth + t.dY + (int) jumpModifier, null);
+                canvas.drawBitmap(b,
+                        screenDw + t.Column * tileWidth + t.dX,
+                        screenDh + t.Row * tileWidth + t.dY + (int) jumpModifier, null);
 
             }
 

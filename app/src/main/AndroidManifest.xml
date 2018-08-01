@@ -27,7 +27,11 @@
         <activity
             android:name=".GameStats"
             android:screenOrientation="portrait" />
-        <activity android:name=".Settings"
+        <activity
+            android:name=".Settings"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".HelpActivity"
             android:screenOrientation="portrait" />
     </application>
 

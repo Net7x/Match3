@@ -84,6 +84,11 @@ public class MainMenuActivity extends Activity {
         startActivityForResult(intent, 0);
     }
 
+    public void help(View view){
+        Intent intent = new Intent(this, HelpActivity.class);
+        startActivity(intent);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

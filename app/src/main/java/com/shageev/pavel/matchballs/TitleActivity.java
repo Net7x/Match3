@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 
+import com.google.android.gms.ads.MobileAds;
+
 public class TitleActivity extends Activity {
 
     @Override
@@ -20,6 +22,7 @@ public class TitleActivity extends Activity {
         final Activity current = this;
         ResourceManager.getInstance().init(this);
         ResourceManager.getInstance().loadImages(current.getResources());
+        MobileAds.initialize(this, "ca-app-pub-6941894855206788~2286055051");
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
